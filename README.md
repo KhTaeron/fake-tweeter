@@ -10,16 +10,10 @@
 
 ## ⚙️ Commandes de démarrage
 
-### 1. 🔧 Construire les conteneurs
+### 1. 🔧 Construire les conteneurs et lancer les services
 
 ```bash
-docker-compose build
-```
-
-### 2. 🚀 Lancer les services
-
-```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
 
 ### 3. 🎼 Installer les dépendances PHP avec Composer
