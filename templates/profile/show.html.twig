@@ -1,0 +1,29 @@
+{# templates/profile/show.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ user.pseudo }}{% endblock %}
+
+{% block body %}
+    <h1>Profil de {{ user.pseudo }}</h1>
+
+    <ul>
+        <li><strong>Pseudo :</strong> {{ user.pseudo }}</li>
+        <li><strong>Date d'inscription :</strong> {{ user.registrationDate|date('d/m/Y') }}</li>
+        <li><strong>Tweets :</strong></li>
+        <ul>
+            {% for tweet in user.tweets %}
+                <li>"{{ tweet.content }}" - {{ tweet.publicationDate|date('d/m/Y H:i') }}</li>
+            {% else %}
+                <li>Aucun tweet</li>
+            {% endfor %}
+        </ul>
+        <li><strong>Abonnements :</strong></li>
+        <ul>
+            {% for subscription in user.subscriptions %}
+                <li>Suivi de : {{ subscription.followedUser.pseudo }}</li>
+            {% else %}
+                <li>Aucun abonnement</li>
+            {% endfor %}
+        </ul>
+    </ul>
+{% endblock %}
