@@ -34,7 +34,7 @@ docker-compose exec php composer install
 
 ## Mettre à jour la BDD avec les migrations :
 
-### 1. Si des migrations sont en attente :
+### 1. Génère les fichiers SQL nécessaires :
 
 ```bash
 docker-compose exec php php bin/console make:migration

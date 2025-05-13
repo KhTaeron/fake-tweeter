@@ -19,4 +19,8 @@ RUN composer install
 # Exposer le port par défaut de PHP-FPM
 EXPOSE 9000
 
-CMD ["php-fpm"]
+COPY --chmod=755 docker/php/entrypoint.sh docker/php/entrypoint.sh
+
+RUN chmod +x docker/php/entrypoint.sh
+
+ENTRYPOINT ["docker/php/entrypoint.sh"]
