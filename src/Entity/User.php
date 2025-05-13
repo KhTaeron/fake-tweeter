@@ -22,6 +22,9 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
+    #[ORM\Column(type: "json")]
+    private array $roles = [];
+
     #[ORM\Column]
     private ?\DateTime $registrationDate = null;
 
@@ -69,6 +72,21 @@ class User
     {
         $this->password = $password;
 
+        return $this;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // Assure-toi que l'utilisateur ait toujours le rôle "ROLE_USER"
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
         return $this;
     }
 

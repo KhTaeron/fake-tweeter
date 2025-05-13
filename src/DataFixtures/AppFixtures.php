@@ -19,6 +19,7 @@ class AppFixtures extends Fixture
             $user = new User();
             $user->setPseudo("user$i");
             $user->setPassword(password_hash("password$i", PASSWORD_BCRYPT));
+            $user->setRoles(['ROLE_USER']);
             $user->setRegistrationDate(new DateTime());
             $manager->persist($user);
             $users[] = $user;
