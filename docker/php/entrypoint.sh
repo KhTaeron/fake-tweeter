@@ -1,9 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "$1" != "" ]; then
     exec "$@";
     exit 0;
 fi
+
+# Migration database
+composer install
 
 # Migration database
 php bin/console d:m:m --no-interaction
