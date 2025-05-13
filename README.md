@@ -30,3 +30,18 @@ docker-compose exec php composer install
 
 ## Accès à l'application :
 📍 http://localhost:8000
+
+
+## Mettre à jour la BDD avec les migrations :
+
+### 1. Si des migrations sont en attente :
+
+```bash
+docker-compose exec php php bin/console make:migration
+```
+
+### 2. Appliquer les changements à la base :
+
+```bash
+docker-compose exec php php bin/console doctrine:migrations:migrate
+```
