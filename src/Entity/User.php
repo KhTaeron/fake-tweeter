@@ -6,15 +6,19 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+class User implements UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column(type: 'string', unique: true, nullable: true)]
+    private ?string $apiKey = null;
 
     #[ORM\Column(length: 255)]
     private ?string $pseudo = null;
@@ -42,7 +46,7 @@ class User
      */
     #[ORM\OneToMany(mappedBy: 'followedUser', targetEntity: Subscription::class)]
     private Collection $followers;
-    
+
     public function __construct()
     {
         $this->tweets = new ArrayCollection();
@@ -53,6 +57,17 @@ class User
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getApiKey(): ?string
+    {
+        return $this->apiKey;
+    }
+
+    public function setApiKey(?string $apiKey): self
+    {
+        $this->apiKey = $apiKey;
+        return $this;
     }
 
     public function getPseudo(): ?string
@@ -151,13 +166,26 @@ class User
         return $this;
     }
 
-
     /**
      * @return Collection<int, Subscription>
      */
     public function getFollowers(): Collection
     {
         return $this->followers;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->pseudo;
+    }
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Laisse vide, sauf si tu stockes des informations sensibles que tu veux effacer
     }
 
 }

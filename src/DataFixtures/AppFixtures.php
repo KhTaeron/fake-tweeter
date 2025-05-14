@@ -17,6 +17,7 @@ class AppFixtures extends Fixture
         $users = [];
         for ($i = 1; $i <= 5; $i++) {
             $user = new User();
+            $user->setApiKey(bin2hex(random_bytes(32)));
             $user->setPseudo("user$i");
             $user->setPassword(password_hash("password$i", PASSWORD_BCRYPT));
             $user->setRegistrationDate(new DateTime());
