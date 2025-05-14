@@ -2,122 +2,25 @@
 
 {% block title %}Explorer les Tweets{% endblock %}
 
-{% block stylesheets %}
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #e6ecf0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            padding: 20px;
-        }
-        .tweet {
-            border-bottom: 1px solid #e1e8ed;
-            padding: 15px 0;
-        }
-        .tweet:last-child {
-            border-bottom: none;
-        }
-        .tweet strong {
-            color: #1da1f2;
-            font-size: 16px;
-        }
-        .tweet small {
-            color: #657786;
-        }
-        .search-bar {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        .search-bar input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 20px 0 0 20px;
-            outline: none;
-        }
-        .search-bar button {
-            padding: 10px 20px;
-            background-color: #1da1f2;
-            border: none;
-            color: white;
-            border-radius: 0 20px 20px 0;
-            cursor: pointer;
-        }
-        .search-bar button:hover {
-            background-color: #1991da;
-        }
-    </style>
-{% endblock %}
-
 {% block body %}
-<div class="container">
-    <h1 style="text-align: center;">Explorer les Tweets</h1>
+<h1>Explorer les Tweets</h1>
 
-    <form method="get" action="{{ path('tweets_home') }}" class="search-bar">
-        <input type="text" name="q" placeholder="Rechercher un mot..." value="{{ keyword }}">
-        <button type="submit">Rechercher</button>
-    </form>
+<form method="get" action="{{ path('tweets_home') }}">
+    <input type="text" name="q" placeholder="Rechercher un mot..." value="{{ keyword }}">
+    <button type="submit">Rechercher</button>
+</form>
 
-    {% if tweets is empty %}
-        <p style="text-align: center; color: #657786;">Aucun tweet trouvé.</p>
-    {% else %}
+{% if tweets is empty %}
+    <p>Aucun tweet trouvé.</p>
+{% else %}
+    <ul>
         {% for tweet in tweets %}
-            <div class="tweet">
-                <a href="{{ path('tweet_show', { id: tweet.id }) }}" style="text-decoration: none; color: inherit;">
-                    <strong>{{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}</strong><br>
-                    {{ tweet.content }}<br>
-                    <small>{{ tweet.publicationDate|date('d/m/Y H:i') }}</small>
-                </a>
-            </div>
+            <li>
+                <strong>{{ tweet.tweeter is defined and tweet.tweeter.pseudo is defined ? tweet.tweeter.pseudo : 'Utilisateur inconnu' }}</strong> 
+                {{ tweet.content }}<br>
+                <small>{{ tweet.publicationDate|date('d/m/Y H:i') }}</small>
+            </li>
         {% endfor %}
-    {% endif %}
-</div>
-<!-- Modal pour les likes -->
-<div id="likes-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-        <span class="close-modal" style="cursor:pointer;">&times;</span>
-        <h2>Utilisateurs ayant liké</h2>
-        <ul id="likes-list"></ul>
-    </div>
-</div>
-{% endblock %}
-
-{% block javascripts %}
-{{ parent() }}
-<script>
-document.querySelectorAll('.like-count-btn').forEach(button => {
-    button.addEventListener('click', async () => {
-        const tweetId = button.dataset.tweetId;
-        const modal = document.getElementById('likes-modal');
-        const list = document.getElementById('likes-list');
-        list.innerHTML = 'Chargement...';
-
-        try {
-            const response = await fetch(`/tweets/${tweetId}/likes`);
-            const users = await response.json();
-
-            list.innerHTML = '';
-            users.forEach(user => {
-                const li = document.createElement('li');
-                li.textContent = user.pseudo;
-                list.appendChild(li);
-            });
-
-            modal.style.display = 'block';
-        } catch (e) {
-            list.innerHTML = '<li>Erreur de chargement</li>';
-        }
-    });
-});
-
-document.querySelector('.close-modal').addEventListener('click', () => {
-    document.getElementById('likes-modal').style.display = 'none';
-});
-</script>
+    </ul>
+{% endif %}
 {% endblock %}
