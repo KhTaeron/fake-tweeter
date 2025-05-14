@@ -37,10 +37,17 @@ class User
     #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'followingUser')]
     private Collection $subscriptions;
 
+    /**
+     * @var Collection<int, Subscription>
+     */
+    #[ORM\OneToMany(mappedBy: 'followedUser', targetEntity: Subscription::class)]
+    private Collection $followers;
+    
     public function __construct()
     {
         $this->tweets = new ArrayCollection();
         $this->subscriptions = new ArrayCollection();
+        $this->followers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -143,4 +150,14 @@ class User
 
         return $this;
     }
+
+
+    /**
+     * @return Collection<int, Subscription>
+     */
+    public function getFollowers(): Collection
+    {
+        return $this->followers;
+    }
+
 }
