@@ -20,9 +20,17 @@
         <li><strong>Abonnements :</strong></li>
         <ul>
             {% for subscription in user.subscriptions %}
-                <li>Suivi de : {{ subscription.followedUser.pseudo }}</li>
+                <li>{{ subscription.followedUser.pseudo }}</li>
             {% else %}
                 <li>Aucun abonnement</li>
+            {% endfor %}
+        </ul>
+        <li><strong>Abonnés :</strong></li>
+        <ul>
+            {% for subscription in user.followers %}
+                <li>{{ subscription.followingUser.pseudo }}</li>
+            {% else %}
+                <li>Aucun abonné</li>
             {% endfor %}
         </ul>
     </ul>
