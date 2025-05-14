@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Controller;
+
+use App\Repository\UserRepository;
+use App\Entity\User;
+use App\Service\TweetService;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+#[Route('/tweets')]
+class TweetController extends AbstractController
+{
+
+    #[Route('', methods: ['GET'], name: 'tweets_list')]
+    public function list(TweetService $tweets): JsonResponse{
+        return $this->json($tweets->list());
+    }
+
+    #[Route('/{id}', methods: ['GET'], name: 'tweet_show')]
+    public function show(int $id, TweetService $tweets): JsonResponse{
+        $tweet = $tweets->get($id);
+
+        return $tweet
+            ? $this->json($tweet)
+            : $this->json(['error' => 'Tweet introuvable'], JsonResponse::HTTP_NOT_FOUND);
+    }
+
+    #[Route('', methods: ['POST'], name: 'tweet_create')]
+    public function create(Request $request, TweetService $tweets, UserRepository $users, ValidatorInterface $validator): JsonResponse {
+        $payload = $request->toArray();
+
+        $violations = $validator->validate(
+            $payload,
+            new Assert\Collection([
+                'fields' => [
+                    'content'   => [new Assert\NotBlank(), new Assert\Length(max: 280)],
+                    'tweeterId' => [new Assert\NotBlank(), new Assert\Positive()],
+                ],
+                'allowExtraFields' => true,
+            ])
+        );
+
+        if (\count($violations) > 0) {
+            return $this->json(['error' => (string) $violations], 422);
+        }
+
+        $user = $users->find($payload['tweeterId']);
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur introuvable'], 404);
+        }
+
+        try {
+            $data = $tweets->create($payload, $user);
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['error' => $e->getMessage()], 422);
+        }
+
+        return $this->json($data, 201, [
+            'Location' => $this->generateUrl('tweet_show', ['id' => $data['id']]),
+        ]);
+    }
+
+    #[Route('/{id}', methods: ['DELETE'], name: 'tweet_delete')]
+    public function delete(int $id, TweetService $tweets): JsonResponse {
+        try {
+            $tweets->delete($id);
+        } catch (\RuntimeException $e) {
+            return $this->json(['error' => $e->getMessage()], 404);
+        }
+        
+        return new JsonResponse(null, 204);
+    }
+
+    #[Route('/{id}/likes', methods: ['GET'], name: 'tweet_likes')]
+    public function likes(int $id, TweetService $tweets): JsonResponse {
+        try {
+            $likes = $tweets->getLikes($id);
+        } catch (\RuntimeException $e) {
+            return $this->json(['error' => $e->getMessage()], 404);
+        }
+
+        return $this->json($likes);
+    }
+
+    #[Route('/{id}', methods: ['PUT'], name: 'tweet_update')]
+    public function update(int $id, Request $request, TweetService $tweets): JsonResponse {
+        $payload = $request->toArray();
+
+        try {
+            $updated = $tweets->update($id, $payload);
+        } catch (\RuntimeException $e) {
+            return $this->json(['error' => $e->getMessage()], 404);
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['error' => $e->getMessage()], 422);
+        }
+
+        return $this->json($updated);
+    }
+
+
+
+}

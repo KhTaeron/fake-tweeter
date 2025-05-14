@@ -16,6 +16,31 @@ class TweetRepository extends ServiceEntityRepository
         parent::__construct($registry, Tweet::class);
     }
 
+    public function fetchAllOrdered(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t.id',
+                     't.content',
+                     't.publicationDate',
+                     'IDENTITY(t.tweeter) AS tweeterId')
+            ->orderBy('t.publicationDate', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function fetchOneById(int $id): ?array
+    {
+        return $this->createQueryBuilder('t')
+            ->select('t.id',
+                     't.content',
+                     't.publicationDate',
+                     'IDENTITY(t.tweeter) AS tweeterId')
+            ->andWhere('t.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();   
+    }
+
 //    /**
 //     * @return Tweet[] Returns an array of Tweet objects
 //     */
