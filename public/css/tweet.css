@@ -1,0 +1,48 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #e6ecf0;
+}
+.container {
+  max-width: 600px;
+  margin: 30px auto;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+.tweet {
+  border-bottom: 1px solid #e1e8ed;
+  padding: 15px 0;
+}
+.tweet:last-child {
+  border-bottom: none;
+}
+.tweet strong {
+  color: #1da1f2;
+  font-size: 16px;
+}
+.tweet small {
+  color: #657786;
+}
+.search-bar {
+  display: flex;
+  margin-bottom: 20px;
+}
+.search-bar input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px 0 0 20px;
+  outline: none;
+}
+.search-bar button {
+  padding: 10px 20px;
+  background-color: #1da1f2;
+  border: none;
+  color: white;
+  border-radius: 0 20px 20px 0;
+  cursor: pointer;
+}
+.search-bar button:hover {
+  background-color: #1991da;
+}

@@ -14,21 +14,38 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class TweetService
 {
     public function __construct(
-        private TweetRepository       $tweets,
+        private TweetRepository $tweets,
         private EntityManagerInterface $em,
-        private ValidatorInterface     $validator
-    ) {}
+        private ValidatorInterface $validator
+    ) {
+    }
 
-    public function list(): array {
+    public function list(): array
+    {
         $rawTweets = $this->tweets->fetchAllOrdered();
+
+        return array_map(function (Tweet $tweet) {
+            return [
+                'id' => $tweet->getId(),
+                'content' => $tweet->getContent(),
+                'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
+                'tweeter' => [
+                    'id' => $tweet->getTweeter()?->getId(),
+                    'pseudo' => $tweet->getTweeter()?->getPseudo(),
+                ],
+            ];
+        }, $rawTweets);
     }
 
 
-    public function get(int $id): ?array {
+
+    public function get(int $id): ?array
+    {
         return $this->tweets->fetchOneById($id);
     }
 
-    public function create(array $payload, User $author): array{
+    public function create(array $payload, User $author): array
+    {
         $violations = $this->validator->validate(
             $payload,
             new Assert\Collection([
@@ -52,19 +69,20 @@ class TweetService
         $this->em->flush();
 
         return [
-            'id'              => $tweet->getId(),
-            'content'         => $tweet->getContent(),
+            'id' => $tweet->getId(),
+            'content' => $tweet->getContent(),
             'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
-            'tweeterId'       => $author->getId(),
+            'tweeterId' => $author->getId(),
         ];
     }
 
-    public function delete(int $id): void {
+    public function delete(int $id): void
+    {
         /** @var ?Tweet $tweet */
         $tweet = $this->em->getRepository(Tweet::class)->find($id);
 
         if (!$tweet) {
-            throw new \RuntimeException('Tweet introuvable : '.$id);
+            throw new \RuntimeException('Tweet introuvable : ' . $id);
         }
 
         // Ajouter l'obligation d'être auteur / admin pour supprimer
@@ -73,7 +91,8 @@ class TweetService
         $this->em->flush();
     }
 
-    public function getLikes(int $tweetId): array {
+    public function getLikes(int $tweetId): array
+    {
         $tweet = $this->em->getRepository(\App\Entity\Tweet::class)->find($tweetId);
 
         if (!$tweet) {
@@ -82,7 +101,7 @@ class TweetService
 
         $likes = $tweet->getLikes();
 
-        return array_map(function(\App\Entity\Like $like) {
+        return array_map(function (\App\Entity\Like $like) {
             $user = $like->getTweeter();
             return [
                 'id' => $user->getId(),
@@ -91,7 +110,8 @@ class TweetService
         }, $likes->toArray());
     }
 
-    public function update(int $id, array $payload): array {
+    public function update(int $id, array $payload): array
+    {
         $tweet = $this->em->getRepository(\App\Entity\Tweet::class)->find($id);
 
         if (!$tweet) {
@@ -129,7 +149,8 @@ class TweetService
         return $this->tweets->searchByKeyword($keyword);
     }
 
-    public function getFullEntity(int $id): ?Tweet {
+    public function getFullEntity(int $id): ?Tweet
+    {
         return $this->em->getRepository(Tweet::class)->find($id);
     }
 

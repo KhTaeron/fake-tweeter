@@ -3,50 +3,42 @@
 namespace App\Service;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class TweetApiClientService
 {
-    private string $apiBaseUrl;
-
     public function __construct(
         private HttpClientInterface $client,
-        string $apiBaseUrl // injecté via services.yaml ou .env
+        private string $apiBaseUrl
     ) {
-        $this->apiBaseUrl = rtrim($apiBaseUrl, '/');
     }
 
-    public function getTweets(string $keyword = ''): array
+    public function getTweets(): array
     {
         $url = $this->apiBaseUrl . '/tweets';
-        if ($keyword !== '') {
-            $url .= '?q=' . urlencode($keyword);
-        }
-
         return $this->fetchJson($url);
     }
 
-    public function getTweet(int $id): array
+
+    public function getTweet(int $id): ?array
     {
-        return $this->fetchJson($this->apiBaseUrl . '/tweets/' . $id);
+        return $this->fetchJson($this->apiBaseUrl . "/tweets/$id");
     }
 
-    public function getLikes(int $tweetId): array
+    public function getLikes(int $id): array
     {
-        return $this->fetchJson($this->apiBaseUrl . '/tweets/' . $tweetId . '/likes');
+        return $this->fetchJson($this->apiBaseUrl . "/tweets/$id/likes");
     }
 
     private function fetchJson(string $url): array
     {
         try {
             $response = $this->client->request('GET', $url);
-            if ($response->getStatusCode() >= 400) {
-                return [];
-            }
-            return $response->toArray();
-        } catch (TransportExceptionInterface $e) {
-            // Logguer ici si nécessaire
+            dump($url, $response->getStatusCode(), $response->getContent());
+            return $response->getStatusCode() === 200 ? $response->toArray() : [];
+        } catch (\Throwable $e) {
+            dump('HTTP ERROR', $e->getMessage());
             return [];
         }
     }
+
 }
