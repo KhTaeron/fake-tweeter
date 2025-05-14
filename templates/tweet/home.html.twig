@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Explorer les Tweets{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/tweet.css') }}">
+{% endblock %}
+{% block body %}
+<div class="container">
+    <h1 style="text-align: center;">Explorer les Tweets</h1>
+
+    <form method="get" action="{{ path('tweets_home') }}" class="search-bar">
+        <input type="text" name="q" placeholder="Rechercher un mot..." value="{{ keyword }}">
+        <button type="submit">Rechercher</button>
+    </form>
+
+    {% if tweets is empty %}
+        <p style="text-align: center; color: #657786;">Aucun tweet trouvé.</p>
+    {% else %}
+        {% for tweet in tweets %}
+            <div class="tweet">
+                <a href="{{ path('tweet_show', { id: tweet.id }) }}" style="text-decoration: none; color: inherit;">
+                    <strong>{{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}</strong><br>
+                    {{ tweet.content }}<br>
+                    <small>{{ tweet.publicationDate|date('d/m/Y H:i') }}</small>
+                    <button class="like-count-btn" data-tweet-id="{{ tweet.id }}">
+                        {{ tweet.likeCount ?? 0 }} j'aime
+                    </button>
+                </a>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+<!-- Modal pour les likes -->
+<div id="likes-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-modal" style="cursor:pointer;">&times;</span>
+        <h2>Utilisateurs ayant liké</h2>
+        <ul id="likes-list"></ul>
+    </div>
+</div>
+{% endblock %}
