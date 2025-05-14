@@ -11,6 +11,22 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProfileController extends AbstractController
 {
+    
+    #[Route('/profile/me', name: 'profile_me')]
+    public function profileMe(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour voir votre profil.');
+        }
+
+        return $this->render('profile/show.html.twig', [
+            'user' => $user,
+        ]);
+    }
+    
     // Afficher le profil d'un utilisateur
     #[Route('/profile/{id}', name: 'profile_show')]
     public function show(User $user): Response
@@ -30,4 +46,5 @@ class ProfileController extends AbstractController
             'apiKey' => $user->getApiKey(),
         ]);
     }
+
 }

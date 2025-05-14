@@ -178,6 +178,7 @@ class User implements UserInterface
     {
         return $this->pseudo;
     }
+
     public function getRoles(): array
     {
         return ['ROLE_USER'];
