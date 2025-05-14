@@ -19,13 +19,12 @@ class TweetService
         private ValidatorInterface     $validator
     ) {}
 
-    public function list(): array
-    {
-        return $this->tweets->fetchAllOrdered();
+    public function list(): array {
+        $rawTweets = $this->tweets->fetchAllOrdered();
     }
 
-    public function get(int $id): ?array
-    {
+
+    public function get(int $id): ?array {
         return $this->tweets->fetchOneById($id);
     }
 
@@ -120,6 +119,21 @@ class TweetService
             'tweeterId' => $tweet->getTweeter()->getId(),
         ];
     }
+
+    public function search(string $keyword = ''): array
+    {
+        if ($keyword === '') {
+            return $this->tweets->fetchAllOrdered();
+        }
+
+        return $this->tweets->searchByKeyword($keyword);
+    }
+
+    public function getFullEntity(int $id): ?Tweet {
+        return $this->em->getRepository(Tweet::class)->find($id);
+    }
+
+
 
 
 }

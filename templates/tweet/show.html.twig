@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tweet de {{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Tweet</h1>
+
+    <div class="tweet">
+        <strong>{{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}</strong><br>
+        <p>{{ tweet.content }}</p>
+        <small>{{ tweet.publicationDate|date('d/m/Y H:i') }}</small>
+    </div>
+
+    <hr>
+
+    <h2>Commentaires</h2>
+    <p>À venir...</p>
+
+    <a href="{{ path('tweets_home') }}">← Retour à l'exploration</a>
+</div>
+{% endblock %}

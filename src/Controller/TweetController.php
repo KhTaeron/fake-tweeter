@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
@@ -29,7 +30,7 @@ class TweetController extends AbstractController
         return $this->json($tweets->list());
     }
 
-    #[Route('/{id}', methods: ['GET'], name: 'tweet_show')]
+    #[Route('/{id<\d+>}', methods: ['GET'], name: 'tweet_show')]
     #[OA\Get(
         path: '/tweets/{id}',
         summary: 'Afficher un tweet par ID',
@@ -42,12 +43,17 @@ class TweetController extends AbstractController
             new OA\Response(response: 404, description: 'Tweet introuvable')
         ]
     )]
-    public function show(int $id, TweetService $tweets): JsonResponse {
-        $tweet = $tweets->get($id);
+    #[Route('/{id<\d+>}', methods: ['GET'], name: 'tweet_show')]
+    public function show(int $id, TweetService $tweets, Request $request): Response {
+        $tweet = $tweets->getFullEntity($id); // méthode à créer, retourne l'entité complète
 
-        return $tweet
-            ? $this->json($tweet)
-            : $this->json(['error' => 'Tweet introuvable'], JsonResponse::HTTP_NOT_FOUND);
+        if (!$tweet) {
+            throw $this->createNotFoundException('Tweet introuvable');
+        }
+
+        return $this->render('tweet/show.html.twig', [
+            'tweet' => $tweet,
+        ]);
     }
 
     #[Route('', methods: ['POST'], name: 'tweet_create')]
@@ -187,4 +193,17 @@ class TweetController extends AbstractController
 
         return $this->json($updated);
     }
+
+    #[Route('/home', name: 'tweets_home')]
+    public function explore(Request $request, TweetService $tweets): Response
+    {
+        $keyword = $request->query->get('q', '');
+        $results = $tweets->search($keyword);
+
+        return $this->render('tweet/home.html.twig', [
+            'tweets' => $results,
+            'keyword' => $keyword,
+        ]);
+    }
+
 }
