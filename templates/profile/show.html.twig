@@ -11,8 +11,10 @@
 {% block body %}
 <div class="profile-container">
     <div class="profile-header">
+        <a href="{{ path('tweets_home') }}" class="home-link">← Retour aux tweets</a>
         <h1>@{{ user.pseudo }}</h1>
     </div>
+
 
     <ul class="profile-info">
         <li><strong>Pseudo :</strong> {{ user.pseudo }}</li>
@@ -34,7 +36,11 @@
     <div>
         <div class="section-title">Abonnements</div>
         {% for subscription in user.subscriptions %}
-            <div class="following">{{ subscription.followedUser.pseudo }}</div>
+            <a href="{{ path('profile_show', {'id': subscription.followedUser.id}) }}">
+                <div class="following">
+                        {{ subscription.followedUser.pseudo }}
+                </div>
+            </a>
         {% else %}
             <p class="empty">Aucun abonnement</p>
         {% endfor %}
@@ -43,7 +49,11 @@
     <div>
         <div class="section-title">Abonnés</div>
         {% for subscription in user.followers %}
-            <div class="follower">{{ subscription.followingUser.pseudo }}</div>
+            <a href="{{ path('profile_show', {'id': subscription.followingUser.id}) }}">
+                <div class="follower">
+                        {{ subscription.followingUser.pseudo }}
+                </div>
+            </a>
         {% else %}
             <p class="empty">Aucun abonné</p>
         {% endfor %}

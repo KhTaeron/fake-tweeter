@@ -1,0 +1,34 @@
+<?php
+namespace App\Controller\Api;
+
+use App\Entity\User;
+use App\Service\UserService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
+
+#[Route('/users')]
+class UserController extends AbstractController
+{
+    #[Route('/me', name: 'api_user_me', methods: ['GET'])]
+    public function me(UserService $service): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return $this->json($service->getMe($user));
+    }
+
+    #[Route('/{id}', name: 'api_user_show', methods: ['GET'])]
+    public function show(int $id, UserService $service): JsonResponse
+    {
+        $user = $service->getById($id);
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur introuvable'], 404);
+        }
+
+        return $this->json($user);
+    }
+}
