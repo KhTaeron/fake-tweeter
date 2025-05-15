@@ -28,17 +28,15 @@ class TweetApiClientService
     {
         return $this->fetchJson($this->apiBaseUrl . "/tweets/$id/likes");
     }
-
-    private function fetchJson(string $url): array
+    private function fetchJson(string $url): ?array
     {
         try {
             $response = $this->client->request('GET', $url);
-            dump($url, $response->getStatusCode(), $response->getContent());
-            return $response->getStatusCode() === 200 ? $response->toArray() : [];
+            
+            return $response->toArray();
         } catch (\Throwable $e) {
-            dump('HTTP ERROR', $e->getMessage());
-            return [];
+            error_log('fetchJson error: ' . $e->getMessage());
+            return null;
         }
     }
-
 }

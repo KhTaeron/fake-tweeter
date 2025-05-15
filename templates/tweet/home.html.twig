@@ -19,7 +19,7 @@
     {% else %}
         {% for tweet in tweets %}
             <div class="tweet">
-                <a href="{{ path('tweet_show', { id: tweet.id }) }}" style="text-decoration: none; color: inherit;">
+                <a href="{{ path('tweet_detail', { id: tweet.id }) }}" style="text-decoration: none; color: inherit;">
                     <strong>{{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}</strong><br>
                     {{ tweet.content }}<br>
                     <small>{{ tweet.publicationDate|date('d/m/Y H:i') }}</small>
@@ -30,13 +30,5 @@
             </div>
         {% endfor %}
     {% endif %}
-</div>
-<!-- Modal pour les likes -->
-<div id="likes-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-        <span class="close-modal" style="cursor:pointer;">&times;</span>
-        <h2>Utilisateurs ayant liké</h2>
-        <ul id="likes-list"></ul>
-    </div>
 </div>
 {% endblock %}

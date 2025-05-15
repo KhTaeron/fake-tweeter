@@ -26,11 +26,12 @@ class TweetController extends AbstractController
             new OA\Response(response: 200, description: 'Liste des tweets')
         ]
     )]
-    public function list(TweetService $tweets): JsonResponse {
+    public function list(TweetService $tweets): JsonResponse
+    {
         return $this->json($tweets->list());
     }
 
-    #[Route('/{id<\d+>}', methods: ['GET'], name: 'tweet_show')]
+    #[Route('/{id}', methods: ['GET'])]
     #[OA\Get(
         path: '/tweets/{id}',
         summary: 'Afficher un tweet par ID',
@@ -43,17 +44,15 @@ class TweetController extends AbstractController
             new OA\Response(response: 404, description: 'Tweet introuvable')
         ]
     )]
-    #[Route('/{id<\d+>}', methods: ['GET'], name: 'tweet_show')]
-    public function show(int $id, TweetService $tweets, Request $request): Response {
-        $tweet = $tweets->getFullEntity($id); // méthode à créer, retourne l'entité complète
+    public function show(int $id, TweetService $tweets): JsonResponse
+    {
+        $tweet = $tweets->getFullEntity($id);
 
         if (!$tweet) {
-            throw $this->createNotFoundException('Tweet introuvable');
+            return $this->json(['error' => 'Tweet introuvable'], 404);
         }
 
-        return $this->render('tweet/show.html.twig', [
-            'tweet' => $tweet,
-        ]);
+        return $this->json($tweet);
     }
 
     #[Route('', methods: ['POST'], name: 'tweet_create')]
@@ -77,14 +76,15 @@ class TweetController extends AbstractController
             new OA\Response(response: 404, description: 'Utilisateur introuvable')
         ]
     )]
-    public function create(Request $request, TweetService $tweets, UserRepository $users, ValidatorInterface $validator): JsonResponse {
+    public function create(Request $request, TweetService $tweets, UserRepository $users, ValidatorInterface $validator): JsonResponse
+    {
         $payload = $request->toArray();
 
         $violations = $validator->validate(
             $payload,
             new Assert\Collection([
                 'fields' => [
-                    'content'   => [new Assert\NotBlank(), new Assert\Length(max: 280)],
+                    'content' => [new Assert\NotBlank(), new Assert\Length(max: 280)],
                     'tweeterId' => [new Assert\NotBlank(), new Assert\Positive()],
                 ],
                 'allowExtraFields' => true,
@@ -124,7 +124,8 @@ class TweetController extends AbstractController
             new OA\Response(response: 404, description: 'Tweet introuvable')
         ]
     )]
-    public function delete(int $id, TweetService $tweets): JsonResponse {
+    public function delete(int $id, TweetService $tweets): JsonResponse
+    {
         try {
             $tweets->delete($id);
         } catch (\RuntimeException $e) {
@@ -147,7 +148,8 @@ class TweetController extends AbstractController
             new OA\Response(response: 404, description: 'Tweet introuvable')
         ]
     )]
-    public function likes(int $id, TweetService $tweets): JsonResponse {
+    public function likes(int $id, TweetService $tweets): JsonResponse
+    {
         try {
             $likes = $tweets->getLikes($id);
         } catch (\RuntimeException $e) {
@@ -180,7 +182,8 @@ class TweetController extends AbstractController
             new OA\Response(response: 422, description: 'Erreur de validation')
         ]
     )]
-    public function update(int $id, Request $request, TweetService $tweets): JsonResponse {
+    public function update(int $id, Request $request, TweetService $tweets): JsonResponse
+    {
         $payload = $request->toArray();
 
         try {
@@ -192,18 +195,6 @@ class TweetController extends AbstractController
         }
 
         return $this->json($updated);
-    }
-
-    #[Route('/home', name: 'tweets_home')]
-    public function explore(Request $request, TweetService $tweets): Response
-    {
-        $keyword = $request->query->get('q', '');
-        $results = $tweets->search($keyword);
-
-        return $this->render('tweet/home.html.twig', [
-            'tweets' => $results,
-            'keyword' => $keyword,
-        ]);
     }
 
 }
