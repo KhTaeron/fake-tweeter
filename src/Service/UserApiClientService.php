@@ -1,35 +1,25 @@
 <?php
 namespace App\Service;
 
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class UserApiClientService
+class UserApiClientService extends ApiClientBaseService
 {
-    public function __construct(
-        private HttpClientInterface $client,
-        private string $apiBaseUrl
-    ) {}
+    public function setTokenFromSession(SessionInterface $session): void
+    {
+        $token = $session->get('jwt_token');
+        if ($token) {
+            $this->setJwtToken($token);
+        }
+    }
 
     public function getUser(int $id): ?array
     {
-        return $this->fetchJson($this->apiBaseUrl . "/users/$id");
+        return $this->fetchJson("/users/$id");
     }
 
     public function getMe(): ?array
     {
-        return $this->fetchJson($this->apiBaseUrl . "/users/me");
-    }
-
-    private function fetchJson(string $url): ?array
-    {
-        try {
-            $response = $this->client->request('GET', $url);
-            if ($response->getStatusCode() !== 200) {
-                return null;
-            }
-            return $response->toArray();
-        } catch (\Throwable) {
-            return null;
-        }
+        return $this->fetchJson("/users/me");
     }
 }

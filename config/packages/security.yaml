@@ -24,6 +24,7 @@ security:
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+                provider: app_user_provider
 
         api:
             pattern: ^/api/
@@ -35,8 +36,8 @@ security:
             lazy: true
             provider: app_user_provider
             form_login:
-                login_path: app_login
-                check_path: app_login
+                login_path: login_form
+                check_path: login_form
                 default_target_path: profile_me
             logout:
                 path: app_logout
@@ -47,4 +48,3 @@ security:
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/, roles: ROLE_USER }
-        - { path: ^/profile/me, roles: ROLE_USER }
