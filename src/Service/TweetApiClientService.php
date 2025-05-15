@@ -12,10 +12,15 @@ class TweetApiClientService
     ) {
     }
 
-    public function getTweets(): array
+    public function getTweets(string $keyword = ''): array
     {
-        $url = $this->apiBaseUrl . '/tweets';
-        return $this->fetchJson($url);
+        if (!empty($keyword)) {
+            $url = $this->apiBaseUrl . '/tweets/search?q=' . urlencode($keyword);
+        } else {
+            $url = $this->apiBaseUrl . '/tweets';
+        }
+
+        return $this->fetchJson($url) ?? [];
     }
 
     
