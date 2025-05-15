@@ -174,5 +174,24 @@ class TweetService
         ];
     }
 
+    public function toggleLike(int $tweetId, User $user): int
+    {
+        $tweet = $this->tweetRepository->find($tweetId);
+        if (!$tweet) {
+            throw new \RuntimeException('Tweet introuvable');
+        }
+
+        if ($tweet->isLikedBy($user)) {
+            $tweet->removeLike($user);
+        } else {
+            $tweet->addLike($user);
+        }
+
+        $this->em->flush();
+
+        return count($tweet->getLikes());
+    }
+
+
 
 }
