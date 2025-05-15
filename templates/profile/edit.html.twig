@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon pseudo{% endblock %}
+
+{% block body %}
+    <h1>Modifier mon pseudo</h1>
+
+    <form method="post" action="{{ path('profile_update') }}">
+        <label for="pseudo">Pseudo</label>
+        <p>Attention, vous serez déconnecté après avoir modifié votre pseudo - Veuillez vous reconnecter avec le nouveau pseudo.</p>
+        <input type="text" name="pseudo" id="pseudo" value="{{ user.pseudo }}" required>
+
+        <button type="submit">Enregistrer</button>
+    </form>
+{% endblock %}

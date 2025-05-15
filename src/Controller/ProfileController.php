@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Service\UserApiClientService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,10 +22,47 @@ class ProfileController extends AbstractController
             throw $this->createAccessDeniedException('Vous devez être connecté.');
         }
 
-        return $this->render('profile/show.html.twig', [
+        return $this->render('profile/me-profile.html.twig', [
             'user' => $user,
         ]);
     }
+
+    #[Route('/edit', name: 'profile_edit')]
+    public function edit(SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+        $user = $api->getMe();
+
+        if (!$user) {
+            return $this->redirectToRoute('form_login');
+        }
+
+        // Tu pourrais pré-remplir un formulaire ici
+        return $this->render('profile/edit.html.twig', [
+            'user' => $user,
+        ]);
+    }
+
+    #[Route('/update', name: 'profile_update', methods: ['POST'])]
+    public function update(Request $request, SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+
+        $data = [
+            'pseudo' => $request->request->get('pseudo'),
+        ];
+
+        $success = $api->updateMe($data);
+
+        if ($success) {
+            $this->addFlash('success', 'Profil mis à jour.');
+        } else {
+            $this->addFlash('error', 'Échec de la mise à jour.');
+        }
+
+        return $this->redirectToRoute('profile_me');
+    }
+
 
     #[Route('/{id}', name: 'profile_show')]
     public function show(int $id, SessionInterface $session, UserApiClientService $api): Response
@@ -41,4 +79,5 @@ class ProfileController extends AbstractController
             'user' => $user,
         ]);
     }
+
 }

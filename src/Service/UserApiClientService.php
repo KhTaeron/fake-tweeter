@@ -22,4 +22,10 @@ class UserApiClientService extends ApiClientBaseService
     {
         return $this->fetchJson("/users/me");
     }
+
+    public function updateMe(array $data): bool
+    {
+        return $this->putJson('/users/me', $data);
+    }
+
 }
