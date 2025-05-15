@@ -31,6 +31,38 @@ class TweetController extends AbstractController
         return $this->json($tweets->list());
     }
 
+
+    #[Route('/search', name: 'api_tweets_search', methods: ['GET'])]
+    public function search(Request $request, TweetService $tweets): JsonResponse
+    {
+        try {
+            $keyword = $request->query->get('q', '');
+
+            $results = $tweets->search($keyword);
+
+            return $this->json(array_map(function (\App\Entity\Tweet $tweet) {
+                $tweeter = $tweet->getTweeter();
+                return [
+                    'id' => $tweet->getId(),
+                    'content' => $tweet->getContent(),
+                    'publicationDate' => $tweet->getPublicationDate()->format('Y-m-d H:i'),
+                    'tweeter' => $tweeter ? [
+                        'id' => $tweeter->getId(),
+                        'pseudo' => $tweeter->getPseudo(),
+                    ] : null,
+                ];
+            }, $results));
+        } catch (\Throwable $e) {
+            return $this->json([
+                'error' => 'Erreur interne',
+                'type' => get_class($e),
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
+        }
+    }
+
     #[Route('/{id}', methods: ['GET'])]
     #[OA\Get(
         path: '/tweets/{id}',
@@ -197,25 +229,8 @@ class TweetController extends AbstractController
         return $this->json($updated);
     }
 
-    #[Route('/search', name: 'api_tweets_search', methods: ['GET'])]
-    public function search(Request $request, TweetService $tweets): JsonResponse
-    {
-        $keyword = $request->query->get('q', '');
-        var_dump($keyword);
 
-        $results = $tweets->search($keyword);
 
-        return $this->json(array_map(function (\App\Entity\Tweet $tweet) {
-            return [
-                'id' => $tweet->getId(),
-                'content' => $tweet->getContent(),
-                'publicationDate' => $tweet->getPublicationDate()->format('Y-m-d H:i'),
-                'tweeter' => [
-                    'id' => $tweet->getTweeter()->getId(),
-                    'pseudo' => $tweet->getTweeter()->getPseudo(),
-                ],
-            ];
-        }, $results));
-    }
+
 
 }
