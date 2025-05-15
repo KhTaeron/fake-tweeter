@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class TweetService
 {
     public function __construct(
-        private TweetRepository $tweets,
+        private TweetRepository $tweetRepository,
         private EntityManagerInterface $em,
         private ValidatorInterface $validator
     ) {
@@ -22,7 +22,7 @@ class TweetService
 
     public function list(): array
     {
-        $rawTweets = $this->tweets->fetchAllOrdered();
+        $rawTweets = $this->tweetRepository->fetchAllOrdered();
 
         return array_map(function (Tweet $tweet) {
             return [
@@ -41,7 +41,7 @@ class TweetService
 
     public function get(int $id): ?array
     {
-        return $this->tweets->fetchOneById($id);
+        return $this->tweetRepository->fetchOneById($id);
     }
 
     public function create(array $payload, User $author): array
@@ -79,7 +79,7 @@ class TweetService
     public function delete(int $id): void
     {
         /** @var ?Tweet $tweet */
-        $tweet = $this->em->getRepository(Tweet::class)->find($id);
+        $tweet = $this->tweetRepository->find($id);
 
         if (!$tweet) {
             throw new \RuntimeException('Tweet introuvable : ' . $id);
@@ -112,7 +112,7 @@ class TweetService
 
     public function update(int $id, array $payload): array
     {
-        $tweet = $this->em->getRepository(\App\Entity\Tweet::class)->find($id);
+        $tweet = $this->tweetRepository->find($id);
 
         if (!$tweet) {
             throw new \RuntimeException('Tweet introuvable');
@@ -143,18 +143,36 @@ class TweetService
     public function search(string $keyword = ''): array
     {
         if ($keyword === '') {
-            return $this->tweets->fetchAllOrdered();
+            return $this->tweetRepository->fetchAllOrdered();
         }
 
-        return $this->tweets->searchByKeyword($keyword);
+        return $this->tweetRepository->searchByKeyword($keyword);
     }
 
-    public function getFullEntity(int $id): ?Tweet
+    public function getFullEntity(int $id): ?array
     {
-        return $this->em->getRepository(Tweet::class)->find($id);
+        $tweet = $this->tweetRepository->find($id);
+        
+        if (!$tweet) {
+            return null;
+        }
+
+        return $this->formatTweet($tweet);
     }
 
-
+    public function formatTweet(Tweet $tweet): array
+    {
+        return [
+            'id' => $tweet->getId(),
+            'content' => $tweet->getContent(),
+            'publicationDate' => $tweet->getPublicationDate()->format('Y-m-d H:i:s'),
+            'tweeter' => [
+                'id' => $tweet->getTweeter()->getId(),
+                'pseudo' => $tweet->getTweeter()->getPseudo(),
+            ],
+            'likeCount' => count($tweet->getLikes()),
+        ];
+    }
 
 
 }
