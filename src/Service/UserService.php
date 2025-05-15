@@ -3,11 +3,13 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class UserService
 {
     public function __construct(
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private EntityManagerInterface $entityManagerInterface
     ) {
     }
 
@@ -25,6 +27,13 @@ class UserService
     public function getMe(User $user): array
     {
         return $this->formatUser($user, true);
+    }
+
+    public function updateUser(User $user, string $pseudo): void
+    {
+        $user->setPseudo($pseudo);
+        $this->entityManagerInterface->persist($user);
+        $this->entityManagerInterface->flush();
     }
 
     private function formatUser(User $user, bool $includeApiKey = false): array

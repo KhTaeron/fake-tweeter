@@ -1,0 +1,63 @@
+{# templates/profile/show.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ user.pseudo }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+{% endblock %}
+
+
+{% block body %}
+<div class="profile-container">
+    <div class="profile-header">
+        <a href="{{ path('tweets_home') }}" class="home-link">← Retour aux tweets</a>
+        <h1>Bienvenue sur votre profil, {{ user.pseudo }}</h1>
+        <a href="{{ path('profile_edit') }}" class="edit-link" title="Modifier le profil">✏️</a>
+    </div>
+
+
+    <ul class="profile-info">
+        <li><strong>Pseudo :</strong> {{ user.pseudo }}</li>
+        <li><strong>Date d'inscription :</strong> {{ user.registrationDate|date('d/m/Y') }}</li>
+    </ul>
+
+    <div>
+        <div class="section-title">Tweets</div>
+        {% for tweet in user.tweets %}
+            <div class="tweet">
+                <p>{{ tweet.content }}</p>
+                <time>{{ tweet.publicationDate|date('d/m/Y H:i') }}</time>
+            </div>
+        {% else %}
+            <p class="empty">Aucun tweet</p>
+        {% endfor %}
+    </div>
+
+    <div>
+        <div class="section-title">Abonnements</div>
+        {% for subscription in user.subscriptions %}
+            <a href="{{ path('profile_show', {'id': subscription.followedUser.id}) }}">
+                <div class="following">
+                        {{ subscription.followedUser.pseudo }}
+                </div>
+            </a>
+        {% else %}
+            <p class="empty">Aucun abonnement</p>
+        {% endfor %}
+    </div>
+
+    <div>
+        <div class="section-title">Abonnés</div>
+        {% for subscription in user.followers %}
+            <a href="{{ path('profile_show', {'id': subscription.followingUser.id}) }}">
+                <div class="follower">
+                        {{ subscription.followingUser.pseudo }}
+                </div>
+            </a>
+        {% else %}
+            <p class="empty">Aucun abonné</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
