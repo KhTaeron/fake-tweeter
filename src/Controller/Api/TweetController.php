@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
 
-#[Route('/tweets')]
+#[Route('/api/tweets')]
 class TweetController extends AbstractController
 {
     #[Route('', methods: ['GET'], name: 'tweets_list')]
