@@ -28,4 +28,29 @@ class AuthApiClientService extends ApiClientBaseService
             return false;
         }
     }
+
+    public function register(array $data): array
+    {
+        try {
+            $response = $this->client->request('POST', $this->apiBaseUrl . '/register', [
+                'json' => $data,
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            $body = $response->getContent(false);
+
+            return [
+                'success' => in_array($statusCode, [200, 201]),
+                'status' => $statusCode,
+                'data' => json_decode($body, true),
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'status' => 500,
+                'data' => ['error' => $e->getMessage()],
+            ];
+        }
+    }
+
 }

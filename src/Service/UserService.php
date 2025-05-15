@@ -4,6 +4,7 @@ namespace App\Service;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserService
 {
@@ -70,4 +71,20 @@ class UserService
         return $data;
     }
 
+    public function register(string $pseudo, string $plainPassword, UserPasswordHasherInterface $hasher): User
+    {
+        if ($this->userRepository->findOneBy(['pseudo' => $pseudo])) {
+            throw new \RuntimeException('Pseudo déjà utilisé');
+        }
+
+        $user = new User();
+        $user->setPseudo($pseudo);
+        $user->setPassword($hasher->hashPassword($user, $plainPassword));
+        $user->setRegistrationDate(new \DateTime());
+
+        $this->entityManagerInterface->persist($user);
+        $this->entityManagerInterface->flush();
+
+        return $user;
+    }
 }
