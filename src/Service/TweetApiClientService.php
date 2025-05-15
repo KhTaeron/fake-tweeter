@@ -18,7 +18,7 @@ class TweetApiClientService
         return $this->fetchJson($url);
     }
 
-
+    
     public function getTweet(int $id): ?array
     {
         return $this->fetchJson($this->apiBaseUrl . "/tweets/$id");

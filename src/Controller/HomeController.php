@@ -18,6 +18,11 @@ class HomeController extends AbstractController
         $keyword = $request->query->get('q', '');
         $tweets = $api->getTweets($keyword);
 
+        foreach ($tweets as &$tweet) {
+            $likes = $api->getLikes($tweet['id']);
+            $tweet['likes_count'] = count($likes);
+        }
+
         return $this->render('tweet/home.html.twig', [
             'tweets' => $tweets,
             'keyword' => $keyword,
