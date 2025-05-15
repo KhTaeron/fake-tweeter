@@ -167,20 +167,28 @@ class TweetController extends AbstractController
         return new JsonResponse(null, 204);
     }
 
-    #[Route('/{id}/like', name: 'tweet_like', methods: ['POST'])]
-    public function like(int $id, TweetService $tweets): JsonResponse
+    #[Route('/{id}/likes', methods: ['GET'], name: 'tweet_likes')]
+    #[OA\Get(
+        path: '/tweets/{id}/likes',
+        summary: 'Afficher les utilisateurs ayant liké un tweet',
+        tags: ['Tweets'],
+        parameters: [
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Liste des likes'),
+            new OA\Response(response: 404, description: 'Tweet introuvable')
+        ]
+    )]
+    public function likes(int $id, TweetService $tweets): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->json(['error' => 'Unauthorized'], 401);
+        try {
+            $likes = $tweets->getLikes($id);
+        } catch (\RuntimeException $e) {
+            return $this->json(['error' => $e->getMessage()], 404);
         }
 
-        try {
-            $count = $tweets->toggleLike($id, $user);
-            return $this->json(['likes' => $count]);
-        } catch (\Throwable $e) {
-            return $this->json(['error' => $e->getMessage()], 500);
-        }
+        return $this->json($likes);
     }
 
     #[Route('/{id}', methods: ['PUT'], name: 'tweet_update')]

@@ -22,6 +22,7 @@ class HomeController extends AbstractController
         $tweets = $api->getTweets($keyword);
 
         foreach ($tweets as &$tweet) {
+            
             $likes = $api->getLikes($tweet['id']);
             $tweet['likes_count'] = count($likes);
         }
