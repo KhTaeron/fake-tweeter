@@ -24,6 +24,10 @@
     {% endfor %}
     </ul>
 
+    <form method="post" action="{{ path('tweet_like', { id: tweet.id }) }}">
+        <button type="submit">❤️ Liker</button>
+    </form>
+
     <a href="{{ path('tweets_home') }}">← Retour à l'exploration</a>
 </div>
 {% endblock %}

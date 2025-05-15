@@ -24,7 +24,7 @@ class TweetApiClientService extends ApiClientBaseService
             return $this->fetchJson('/tweets');
         }
     }
-    
+
     public function getTweet(int $id): ?array
     {
         return $this->fetchJson("/tweets/$id");
@@ -34,4 +34,10 @@ class TweetApiClientService extends ApiClientBaseService
     {
         return $this->fetchJson("/tweets/$id/likes");
     }
+
+    public function likeTweet(int $tweetId): bool
+    {
+        return $this->postJson("/tweets/$tweetId/likes", []);
+    }
+
 }

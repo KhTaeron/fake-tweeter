@@ -38,6 +38,33 @@ abstract class ApiClientBaseService
         }
     }
 
+    protected function postJson(string $endpoint, array $data): bool
+    {
+        if (!$this->jwtToken) {
+            throw new \LogicException('JWT token is not set. Please login first.');
+        }
+
+        try {
+            $response = $this->client->request('POST', $this->apiBaseUrl . $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->jwtToken,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $data,
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            if (in_array($statusCode, [200, 201])) {
+                return true;
+            }
+
+            return false;
+        } catch (\Throwable $e) {
+            error_log('postJson error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     protected function putJson(string $endpoint, array $data): bool
     {
         if (!$this->jwtToken) {

@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/tweet')]
 class PostController extends AbstractController
 {
-#[Route('/{id}', name: 'tweet_detail', requirements: ['id' => '\d+'])]
+    #[Route('/{id}', name: 'tweet_detail', requirements: ['id' => '\d+'])]
     public function show(int $id, SessionInterface $session, TweetApiClientService $api): Response
     {
         $api->setTokenFromSession($session);
@@ -29,4 +29,21 @@ class PostController extends AbstractController
             'likes' => $likes,
         ]);
     }
+
+    #[Route('/{id}/like', name: 'tweet_like', methods: ['POST'])]
+    public function like(int $id, SessionInterface $session, TweetApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+
+        $ok = $api->likeTweet($id);
+
+        if (!$ok) {
+            $this->addFlash('error', 'Impossible de liker le tweet.');
+        } else {
+            $this->addFlash('success', 'Tweet liké avec succès.');
+        }
+
+        return $this->redirectToRoute('tweet_detail', ['id' => $id]);
+    }
+
 }

@@ -87,6 +87,23 @@ class TweetController extends AbstractController
         return $this->json($tweet);
     }
 
+    #[Route('/{id}/likes', name: 'tweet_like_add', methods: ['POST'])]
+    public function like(int $id, TweetService $tweetService): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
+
+        try {
+                $tweetService->toggleLike($id, $user);
+            return $this->json(['success' => true], 201);
+        } catch (\Throwable $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
     #[Route('', methods: ['POST'], name: 'tweet_create')]
     #[OA\Post(
         path: '/tweets',
