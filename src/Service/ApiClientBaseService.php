@@ -59,4 +59,25 @@ abstract class ApiClientBaseService
             return false;
         }
     }
+
+    protected function delete(string $endpoint): bool
+    {
+        if (!$this->jwtToken) {
+            throw new \LogicException('JWT token is not set. Please login first.');
+        }
+
+        try {
+            $response = $this->client->request('DELETE', $this->apiBaseUrl . $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->jwtToken,
+                ],
+            ]);
+
+            return in_array($response->getStatusCode(), [200, 204]);
+        } catch (\Throwable $e) {
+            error_log('delete error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
 }

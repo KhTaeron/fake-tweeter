@@ -37,6 +37,12 @@ class UserService
         $this->entityManagerInterface->flush();
     }
 
+    public function deleteUser(User $user): void
+    {
+        $this->entityManagerInterface->remove($user);
+        $this->entityManagerInterface->flush();
+    }
+
     private function formatUser(User $user, bool $includeApiKey = false): array
     {
         $data = [
