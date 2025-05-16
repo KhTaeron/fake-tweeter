@@ -8,11 +8,14 @@ use App\Entity\Subscription;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use DateTime;
+use Faker\Factory;
 
 class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+        $faker = Factory::create('fr_FR');
+
         // Create Users
         $users = [];
         for ($i = 1; $i <= 5; $i++) {
@@ -28,10 +31,11 @@ class AppFixtures extends Fixture
         // Create Tweets
         $tweets = [];
         foreach ($users as $user) {
-            for ($i = 1; $i <= 2; $i++) {
+            $tweetCount = rand(1, 4);
+            for ($i = 0; $i < $tweetCount; $i++) {
                 $tweet = new Tweet();
-                $tweet->setContent("Tweet $i by " . $user->getPseudo());
-                $tweet->setPublicationDate(new DateTime());
+                $tweet->setContent($faker->realText());
+                $tweet->setPublicationDate($faker->dateTimeBetween('-1 year', 'now'));
                 $tweet->setTweeter($user);
                 $manager->persist($tweet);
                 $tweets[] = $tweet;

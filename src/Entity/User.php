@@ -33,19 +33,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Tweet>
      */
-    #[ORM\OneToMany(targetEntity: Tweet::class, mappedBy: 'tweeter')]
+    #[ORM\OneToMany(mappedBy: 'tweeter', targetEntity: Tweet::class, orphanRemoval: true, cascade: ['remove'])]
     private Collection $tweets;
 
     /**
      * @var Collection<int, Subscription>
      */
-    #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'followingUser')]
+    #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'followingUser', orphanRemoval: true, cascade: ['remove'])]
     private Collection $subscriptions;
 
     /**
      * @var Collection<int, Subscription>
      */
-    #[ORM\OneToMany(mappedBy: 'followedUser', targetEntity: Subscription::class)]
+    #[ORM\OneToMany(mappedBy: 'followedUser', targetEntity: Subscription::class, orphanRemoval: true, cascade: ['remove'])]
     private Collection $followers;
 
     public function __construct()

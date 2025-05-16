@@ -59,5 +59,13 @@
             <p class="empty">Aucun abonné</p>
         {% endfor %}
     </div>
+    
+    <form method="delete" action="{{ path('profile_delete') }}">
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="submit" onclick="return confirm('Supprimer votre compte ?')">
+            🗑️ Supprimer mon compte
+        </button>
+    </form>
+
 </div>
 {% endblock %}

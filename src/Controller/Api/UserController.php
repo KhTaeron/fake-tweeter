@@ -63,5 +63,21 @@ class UserController extends AbstractController
         }
     }
 
+    #[Route('/me', name: 'api_user_delete_me', methods: ['DELETE'])]
+    public function deleteMe(UserService $service): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
+
+        try {
+            $service->deleteUser($user);
+            return $this->json(['message' => 'Utilisateur supprimé'], 204);
+        } catch (\Throwable $e) {
+            return $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
 }
