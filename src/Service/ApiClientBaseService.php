@@ -85,6 +85,7 @@ abstract class ApiClientBaseService
             error_log('putJson error: ' . $e->getMessage());
             return false;
         }
+        
     }
 
     protected function delete(string $endpoint): bool

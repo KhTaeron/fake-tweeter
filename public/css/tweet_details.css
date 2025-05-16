@@ -1,0 +1,74 @@
+body {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background-color: #f5f8fa;
+    margin: 0;
+    padding: 0;
+    color: #14171a;
+}
+
+.container {
+    max-width: 600px;
+    margin: 2rem auto;
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #1da1f2;
+}
+
+.tweet {
+    padding: 1rem;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    background-color: #fff;
+    margin-bottom: 1rem;
+}
+
+.tweet strong {
+    font-size: 1.1rem;
+    color: #14171a;
+}
+
+.tweet p {
+    margin: 0.5rem 0;
+    font-size: 1.2rem;
+    line-height: 1.4;
+}
+
+.tweet small {
+    color: #657786;
+    font-size: 0.85rem;
+}
+
+h2 {
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #1da1f2;
+    border-bottom: 1px solid #e1e8ed;
+    padding-bottom: 0.5rem;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+ul li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e1e8ed;
+}
+
+a {
+    color: #1da1f2;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

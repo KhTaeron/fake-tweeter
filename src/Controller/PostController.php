@@ -29,7 +29,6 @@ class PostController extends AbstractController
             'likes' => $likes,
         ]);
     }
-
     #[Route('/{id}/like', name: 'tweet_like', methods: ['POST'])]
     public function like(int $id, SessionInterface $session, TweetApiClientService $api): Response
     {
@@ -44,6 +43,32 @@ class PostController extends AbstractController
         }
 
         return $this->redirectToRoute('tweet_detail', ['id' => $id]);
+    }
+    #[Route('/{id}/update', name: 'update_post', methods: ['PUT'])]
+    public function updateTweet(int $id, Request $request, SessionInterface $session, TweetApiClientService $api ): Response {
+        $api->setTokenFromSession($session);
+
+        $content = $request->request->get('content');
+
+        $ok = $api->updateTweet($id, ['content' => $content]);
+
+        $this->addFlash($ok ? 'success' : 'error',
+            $ok ? 'Tweet modifié avec succès.' : 'Impossible de modifier le tweet.');
+
+        return $this->redirectToRoute('tweet_detail', ['id' => $id]);
+    }
+
+    #[Route('/{id}/delete', name: 'delete_post', methods: ['DELETE'])]
+    public function deleteTweet(int $id, SessionInterface $session, TweetApiClientService $api ): Response {
+
+        $api->setTokenFromSession($session);
+
+        $ok = $api->deleteTweet($id);
+
+        $this->addFlash($ok ? 'success' : 'error',
+            $ok ? 'Tweet supprimé avec succès.' : 'Impossible de supprimer le tweet.');
+
+        return $this->redirectToRoute('tweets_home', ['id' => $id]);
     }
 
 }

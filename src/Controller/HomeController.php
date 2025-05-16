@@ -32,4 +32,22 @@ class HomeController extends AbstractController
             'keyword' => $keyword,
         ]);
     }
+
+    #[Route('/create', name: 'tweet_create_submit', methods: ['POST'])]
+    public function create(
+        Request $request,
+        SessionInterface $session,
+        TweetApiClientService $api
+    ): Response {
+        $content = $request->request->get('content');
+
+        $api->setTokenFromSession($session);
+
+        $ok = $api->createTweet(['content' => $content]);
+
+        $this->addFlash($ok ? 'success' : 'error',
+            $ok ? 'Tweet publié avec succès.' : 'Impossible de publier le tweet.');
+
+        return $this->redirectToRoute('tweets_home');
+    }
 }

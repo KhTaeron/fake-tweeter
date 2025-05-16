@@ -40,4 +40,21 @@ class TweetApiClientService extends ApiClientBaseService
         return $this->postJson("/tweets/$tweetId/likes", []);
     }
 
+    public function createTweet(array $data): bool
+    {
+        return $this->postJson('/tweets/create', $data);
+    }
+
+    public function updateTweet(int $id, array $data): bool
+    {
+        return $this->putJson("/tweets/$id/update", $data);
+    }
+
+    public function deleteTweet(int $id): bool
+    {
+        return $this->delete("/tweets/$id/delete");
+    }
+
+
+
 }

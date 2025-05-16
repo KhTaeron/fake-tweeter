@@ -46,3 +46,36 @@ body {
 .search-bar button:hover {
   background-color: #1991da;
 }
+
+.new-tweet-box {
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0 2rem;
+    background: #fff;
+}
+
+.new-tweet-box textarea {
+    width: 100%;
+    border: none;
+    resize: vertical;
+    font-size: 1rem;
+    margin-bottom: .5rem;
+}
+
+.tweet-button {
+    background-color: #1da1f2;
+    color: #fff;
+    border: none;
+    padding: .5rem 1rem;
+    border-radius: 9999px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.tweet-button:hover {
+    background-color: #1991da;
+}
+
+
+
