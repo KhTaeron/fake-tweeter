@@ -63,8 +63,22 @@ class ProfileController extends AbstractController
         return $this->redirectToRoute('profile_me');
     }
 
+    #[Route(path: '/delete', name: 'profile_delete', methods: ['DELETE'])]
+    public function deleteAccount(SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setJwtToken($session->get('jwt_token'));
 
-    #[Route('/{id}', name: 'profile_show')]
+        if ($api->deleteMe()) {
+            $session->invalidate();
+            $this->addFlash('success', 'Compte supprimé.');
+        } else {
+            $this->addFlash('error', 'Impossible de supprimer le compte.');
+        }
+
+        return $this->redirectToRoute('login_form');
+    }
+
+    #[Route('/{id}', name: 'profile_show', requirements: ['id' => '\d+'])]
     public function show(int $id, SessionInterface $session, UserApiClientService $api): Response
     {
         $api->setTokenFromSession($session);

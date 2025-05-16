@@ -28,4 +28,9 @@ class UserApiClientService extends ApiClientBaseService
         return $this->putJson('/users/me', $data);
     }
 
+    public function deleteMe(): bool
+    {
+        return $this->delete('/users/me');
+    }
+
 }

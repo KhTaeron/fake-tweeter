@@ -35,4 +35,32 @@ class SecurityController extends AbstractController
 
         return $this->redirectToRoute('tweets_home');
     }
+
+    #[Route('/register', name: 'register_form')]
+    public function registerForm(): Response
+    {
+        return $this->render('security/register.html.twig');
+    }
+
+    #[Route('/register/submit', name: 'register_submit', methods: ['POST'])]
+    public function registerSubmit(Request $request, AuthApiClientService $auth): Response
+    {
+        $data = [
+            'pseudo' => $request->request->get('pseudo'),
+            'password' => $request->request->get('password'),
+        ];
+
+        $result = $auth->register($data);
+
+        if (!$result['success']) {
+            $error = $result['data']['error'] ?? 'Inscription échouée.';
+            $this->addFlash('error', $error);
+            return $this->redirectToRoute('register_form');
+        }
+
+        $this->addFlash('success', 'Compte créé ! Vous pouvez vous connecter.');
+        return $this->redirectToRoute('login_form');
+    }
+
+
 }
