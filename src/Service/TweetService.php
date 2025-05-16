@@ -76,20 +76,22 @@ class TweetService
             'tweeterId' => $author->getId(),
         ];
     }
-    public function delete(int $id): void
-    {
-        /** @var ?Tweet $tweet */
-        $tweet = $this->tweetRepository->find($id);
 
+    public function delete(int $id, User $user): void
+    {
+        $tweet = $this->tweetRepository->find($id);
         if (!$tweet) {
             throw new \RuntimeException('Tweet introuvable : ' . $id);
         }
 
-        // Ajouter l'obligation d'être auteur / admin pour supprimer
+        if ($tweet->getTweeter()->getId() !== $user->getId()) {
+            throw new AccessDeniedException('Vous n’êtes pas autorisé à supprimer ce tweet.');
+        }
 
         $this->em->remove($tweet);
         $this->em->flush();
     }
+
     public function getLikes(int $tweetId): array
     {
         $tweet = $this->em->getRepository(\App\Entity\Tweet::class)->find($tweetId);

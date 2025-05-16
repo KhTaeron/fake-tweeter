@@ -50,6 +50,11 @@ class TweetApiClientService extends ApiClientBaseService
         return $this->putJson("/tweets/$id/update", $data);
     }
 
+    public function deleteTweet(int $id): bool
+    {
+        return $this->delete("/tweets/$id/delete");
+    }
+
 
 
 }

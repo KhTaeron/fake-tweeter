@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Repository\UserRepository;
 use App\Entity\User;
 use App\Service\TweetService;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -135,17 +136,26 @@ class TweetController extends AbstractController
         }
 
     }
-    #[Route('/{id}', methods: ['DELETE'], name: 'tweet_delete')]
-    public function delete(int $id, TweetService $tweets): JsonResponse
+    #[Route('/{id}/delete', methods: ['DELETE'], name: 'tweet_delete')]
+    public function deleteTweet(int $id, TweetService $tweetService): JsonResponse
     {
+        $user = $this->getUser();
+        
+        if (!$user) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
+
         try {
-            $tweets->delete($id);
+            $tweetService->delete($id, $user);
+        } catch (AccessDeniedException $e) {
+            return $this->json(['error' => $e->getMessage()], 403);
         } catch (\RuntimeException $e) {
             return $this->json(['error' => $e->getMessage()], 404);
         }
 
         return new JsonResponse(null, 204);
     }
+
     #[Route('/{id}/likes', methods: ['GET'], name: 'tweet_likes')]
     public function likes(int $id, TweetService $tweets): JsonResponse
     {

@@ -38,6 +38,16 @@
         </form>
     {% endif %}
 
+    {% if tweet.isCurrentUser %}
+        <form method="delete" action="{{ path('delete_post', { id: tweet.id }) }}">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit" onclick="return confirm('Supprimer votre tweet ?')">
+                🗑️ Supprimer mon tweet
+            </button>
+        </form>
+    {% endif %}
+
+
     <a href="{{ path('tweets_home') }}">← Retour à l'exploration</a>
 </div>
 {% endblock %}
