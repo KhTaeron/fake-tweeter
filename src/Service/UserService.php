@@ -1,9 +1,11 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Notification;
 use App\Entity\Subscription;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -132,6 +134,17 @@ class UserService
             $subscription->setSubscriptionDate(new \DateTime());
 
             $this->entityManagerInterface->persist($subscription);
+
+            $notif = new Notification();
+            $notif->setTarget($subscription->getFollowedUser());
+            $notif->setType('follow');
+            $notif->setPayload([
+                'follower' => $user->getPseudo(),
+                'followerId' => $user->getId(),
+            ]);
+            $notif->setIsRead(false);
+            $notif->setCreatedAt(new DateTimeImmutable());
+            $this->entityManagerInterface->persist($notif);
         }
 
         $this->entityManagerInterface->flush();
