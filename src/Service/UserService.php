@@ -1,6 +1,7 @@
 <?php
 namespace App\Service;
 
+use App\Entity\File;
 use App\Entity\Notification;
 use App\Entity\Subscription;
 use App\Entity\User;
@@ -42,6 +43,13 @@ class UserService
         $this->entityManagerInterface->flush();
     }
 
+    public function updateUserAvatar(User $user, File $avatar): void
+    {
+        $user->setAvatar($avatar);
+        $this->entityManagerInterface->persist($user);
+        $this->entityManagerInterface->flush();
+    }
+
     public function deleteUser(User $user): void
     {
         $this->entityManagerInterface->remove($user);
@@ -73,7 +81,15 @@ class UserService
                     'pseudo' => $subscription->getFollowedUser()->getPseudo(),
                 ]
             ], $user->getSubscriptions()->toArray()),
+
         ];
+        
+        if ($user->getAvatar()) {
+            $data['avatar'] = [
+                'path' => $user->getAvatar()->getPath(),
+                'url' => '/uploads/avatars/' . $user->getAvatar()->getPath(),
+            ];
+        }
 
         if ($includeApiKey) {
             $data['apiKey'] = $user->getApiKey();

@@ -3,10 +3,12 @@ namespace App\Controller;
 
 use App\Service\UserApiClientService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/profile')]
 class ProfileController extends AbstractController
@@ -34,13 +36,32 @@ class ProfileController extends AbstractController
         $user = $api->getMe();
 
         if (!$user) {
-            return $this->redirectToRoute('form_login');
+            return $this->redirectToRoute('login_form');
         }
 
         // Tu pourrais pré-remplir un formulaire ici
         return $this->render('profile/edit.html.twig', [
             'user' => $user,
         ]);
+    }
+
+    #[Route('/update/avatar', name: 'profile_update_avatar', methods: ['POST'])]
+    public function updateAvatar(Request $request, SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+
+        $avatarFile = $request->files->get('avatar');
+
+        if (!$avatarFile) {
+            $this->addFlash('error', 'Aucun fichier envoyé.');
+            return $this->redirectToRoute('profile_me');
+        }
+
+        $success = $api->uploadAvatar($avatarFile);
+
+        $this->addFlash($success ? 'success' : 'error', $success ? 'Avatar mis à jour.' : 'Erreur lors de l’envoi de l’avatar.');
+
+        return $this->redirectToRoute('profile_me');
     }
 
     #[Route('/update', name: 'profile_update', methods: ['POST'])]

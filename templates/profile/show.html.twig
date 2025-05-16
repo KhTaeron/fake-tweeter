@@ -16,6 +16,12 @@
     </div>
 
 
+    {% if user.avatar %}
+        <div class="profile-avatar">
+            <img src="{{ asset('uploads/avatars/' ~ user.avatar.path) }}" alt="Avatar de {{ user.pseudo }}" width="150" height="150">
+        </div>
+    {% endif %}
+
     <ul class="profile-info">
         <li><strong>Pseudo :</strong> {{ user.pseudo }}</li>
         <li><strong>Date d'inscription :</strong> {{ user.registrationDate|date('d/m/Y') }}</li>

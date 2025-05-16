@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     api_base_url: '%env(API_BASE_URL)%'
+    avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
 
 services:
     # default configuration for services in *this* file
@@ -13,6 +14,7 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             string $apiBaseUrl: '%api_base_url%'
+            string $avatarsDir: '%avatars_directory%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -23,11 +25,8 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
     
-    # App\Service\TweetApiClientService:
-    #     arguments:
-    #         $apiBaseUrl: '%env(API_BASE_URL)%'
-
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    App\Service\FileService:
+        arguments:
+            $avatarsDir: '%avatars_directory%'
 
     

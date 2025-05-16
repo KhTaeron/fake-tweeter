@@ -38,4 +38,23 @@ class UserApiClientService extends ApiClientBaseService
         return $this->postJson("/users/{$targetUserId}/follow", []);
     }
 
+    public function uploadAvatar(\SplFileInfo $avatarFile): bool
+    {
+        // Crée un fichier temporaire que tu contrôleras
+        $tmpPath = sys_get_temp_dir() . '/' . uniqid('avatar_', true);
+
+        if (!copy($avatarFile->getRealPath(), $tmpPath)) {
+            return false;
+        }
+
+        $tmpFile = new \SplFileInfo($tmpPath);
+
+        $result = $this->postMultipartFile('/files/avatar', $tmpFile);
+
+        // Nettoyage du fichier temporaire après envoi
+        @unlink($tmpPath);
+
+        return $result;
+    }
+
 }

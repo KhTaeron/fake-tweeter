@@ -65,6 +65,35 @@ abstract class ApiClientBaseService
         }
     }
 
+    protected function postMultipartFile(string $endpoint, \SplFileInfo $file, string $fieldName = 'avatar'): bool
+    {
+        if (!$this->jwtToken) {
+            throw new \LogicException('JWT token is not set. Please login first.');
+        }
+
+        try {
+            $client = new \GuzzleHttp\Client();
+
+            $response = $client->request('POST', $this->apiBaseUrl . $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->jwtToken,
+                ],
+                'multipart' => [
+                    [
+                        'name' => $fieldName,
+                        'contents' => fopen($file->getPathname(), 'r'),
+                        'filename' => $file->getFilename(),
+                    ]
+                ]
+            ]);
+
+            return in_array($response->getStatusCode(), [200, 201]);
+        } catch (\Throwable $e) {
+            error_log('postMultipartFile error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     protected function putJson(string $endpoint, array $data): bool
     {
         if (!$this->jwtToken) {

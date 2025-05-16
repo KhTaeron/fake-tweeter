@@ -30,6 +30,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTime $registrationDate = null;
 
+    #[ORM\OneToOne(inversedBy: 'user', targetEntity: File::class, cascade: ['persist'])]
+    private ?File $avatar = null;
+
     /**
      * @var Collection<int, Tweet>
      */
@@ -87,6 +90,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->pseudo = $pseudo;
 
+        return $this;
+    }
+
+    public function getAvatar(): ?File
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?File $avatar): static
+    {
+        $this->avatar = $avatar;
         return $this;
     }
 

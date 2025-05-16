@@ -12,4 +12,10 @@
 
         <button type="submit">Enregistrer</button>
     </form>
+
+    <h2>Mettre à jour l’avatar</h2>
+    <form method="post" action="{{ path('profile_update_avatar') }}" enctype="multipart/form-data">
+        <input type="file" name="avatar">
+        <button type="submit">Mettre à jour l’avatar</button>
+    </form>
 {% endblock %}
