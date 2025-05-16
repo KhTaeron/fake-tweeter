@@ -2,41 +2,42 @@
 
 namespace App\Service;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class TweetApiClientService
+class TweetApiClientService extends ApiClientBaseService
 {
-    public function __construct(
-        private HttpClientInterface $client,
-        private string $apiBaseUrl
-    ) {
-    }
-
-    public function getTweets(): array
+    public function setTokenFromSession(SessionInterface $session): void
     {
-        $url = $this->apiBaseUrl . '/tweets';
-        return $this->fetchJson($url);
+        $token = $session->get('jwt_token');
+        if ($token) {
+            $this->setJwtToken($token);
+        }
     }
 
+    public function getTweets(string $keyword = ''): array
+    {
+        if (!empty($keyword)) {
+            $url = '/tweets/search?q=' . urlencode($keyword);
+            return $this->fetchJson($url);
+        } else {
+            return $this->fetchJson('/tweets');
+        }
+    }
 
     public function getTweet(int $id): ?array
     {
-        return $this->fetchJson($this->apiBaseUrl . "/tweets/$id");
+        return $this->fetchJson("/tweets/$id");
     }
 
     public function getLikes(int $id): array
     {
-        return $this->fetchJson($this->apiBaseUrl . "/tweets/$id/likes");
+        return $this->fetchJson("/tweets/$id/likes");
     }
-    private function fetchJson(string $url): ?array
+
+    public function likeTweet(int $tweetId): bool
     {
-        try {
-            $response = $this->client->request('GET', $url);
-            
-            return $response->toArray();
-        } catch (\Throwable $e) {
-            error_log('fetchJson error: ' . $e->getMessage());
-            return null;
-        }
+        return $this->postJson("/tweets/$tweetId/likes", []);
     }
+
 }

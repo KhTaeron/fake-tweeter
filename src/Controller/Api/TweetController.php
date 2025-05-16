@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
 
-#[Route('/tweets')]
+#[Route('/api/tweets')]
 class TweetController extends AbstractController
 {
     #[Route('', methods: ['GET'], name: 'tweets_list')]
@@ -29,6 +29,38 @@ class TweetController extends AbstractController
     public function list(TweetService $tweets): JsonResponse
     {
         return $this->json($tweets->list());
+    }
+
+
+    #[Route('/search', name: 'api_tweets_search', methods: ['GET'])]
+    public function search(Request $request, TweetService $tweets): JsonResponse
+    {
+        try {
+            $keyword = $request->query->get('q', '');
+
+            $results = $tweets->search($keyword);
+
+            return $this->json(array_map(function (\App\Entity\Tweet $tweet) {
+                $tweeter = $tweet->getTweeter();
+                return [
+                    'id' => $tweet->getId(),
+                    'content' => $tweet->getContent(),
+                    'publicationDate' => $tweet->getPublicationDate()->format('Y-m-d H:i'),
+                    'tweeter' => $tweeter ? [
+                        'id' => $tweeter->getId(),
+                        'pseudo' => $tweeter->getPseudo(),
+                    ] : null,
+                ];
+            }, $results));
+        } catch (\Throwable $e) {
+            return $this->json([
+                'error' => 'Erreur interne',
+                'type' => get_class($e),
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
+        }
     }
 
     #[Route('/{id}', methods: ['GET'])]
@@ -53,6 +85,23 @@ class TweetController extends AbstractController
         }
 
         return $this->json($tweet);
+    }
+
+    #[Route('/{id}/likes', name: 'tweet_like_add', methods: ['POST'])]
+    public function like(int $id, TweetService $tweetService): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
+
+        try {
+                $tweetService->toggleLike($id, $user);
+            return $this->json(['success' => true], 201);
+        } catch (\Throwable $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
     }
 
     #[Route('', methods: ['POST'], name: 'tweet_create')]
@@ -196,5 +245,9 @@ class TweetController extends AbstractController
 
         return $this->json($updated);
     }
+
+
+
+
 
 }

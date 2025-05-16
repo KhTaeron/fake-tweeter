@@ -23,9 +23,11 @@
                     <strong>{{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}</strong><br>
                     {{ tweet.content }}<br>
                     <small>{{ tweet.publicationDate|date('d/m/Y H:i') }}</small>
-                    <button class="like-count-btn" data-tweet-id="{{ tweet.id }}">
-                        {{ tweet.likeCount ?? 0 }} j'aime
-                    </button>
+
+                    <div class="tweet">
+                        <p><strong>{{ tweet.likes_count }} like{{ tweet.likes_count > 1 ? 's' : '' }}</strong></p>
+                    </div>
+
                 </a>
             </div>
         {% endfor %}

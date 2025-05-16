@@ -14,8 +14,19 @@
 
     <hr>
 
-    <h2>Commentaires</h2>
-    <p>À venir...</p>
+    <h2>Likes</h2>
+
+    <ul>
+    {% for like in likes %}
+        <li>{{ like.pseudo }}</li>
+    {% else %}
+        <li>Aucun like pour ce tweet.</li>
+    {% endfor %}
+    </ul>
+
+    <form method="post" action="{{ path('tweet_like', { id: tweet.id }) }}">
+        <button type="submit">❤️ Liker</button>
+    </form>
 
     <a href="{{ path('tweets_home') }}">← Retour à l'exploration</a>
 </div>

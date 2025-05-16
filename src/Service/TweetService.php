@@ -152,7 +152,7 @@ class TweetService
     public function getFullEntity(int $id): ?array
     {
         $tweet = $this->tweetRepository->find($id);
-        
+
         if (!$tweet) {
             return null;
         }
@@ -174,5 +174,34 @@ class TweetService
         ];
     }
 
+    public function toggleLike(int $tweetId, User $user): int
+    {
+        $tweet = $this->em->getRepository(Tweet::class)->find($tweetId);
+
+        if (!$tweet) {
+            throw new \RuntimeException('Tweet introuvable.');
+        }
+
+        $existingLike = $this->em->getRepository(Like::class)->findOneBy([
+            'likedTweet' => $tweet,
+            'tweeter' => $user,
+        ]);
+
+        if ($existingLike) {
+            $this->em->remove($existingLike);
+        } else {
+            $like = new Like();
+            $like->setLikedTweet($tweet);
+            $like->setTweeter($user);
+            $like->setLikeDate(new \DateTime());
+
+            $this->em->persist($like);
+        }
+
+        $this->em->flush();
+
+        // On retourne le nombre de likes après changement
+        return count($tweet->getLikes());
+    }
 
 }
