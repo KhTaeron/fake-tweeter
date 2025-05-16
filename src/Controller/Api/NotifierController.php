@@ -32,7 +32,28 @@ class NotifierController extends AbstractController
 
         $notifications = $notificationRepository->findBy(['target' => $user], ['createdAt' => 'DESC']);
         $formattedNotifs = $notificationService->formatList($notifications);
-        
+
         return $this->json($formattedNotifs);
     }
+
+    #[Route('/{id}/read', name: 'mark_notification_read', methods: ['PUT'])]
+    public function markAsRead(int $id, NotificationService $notificationService, NotificationRepository $notificationRepository ): JsonResponse
+    {
+        $notification = $notificationRepository->find($id);
+
+        if (!$notification) {
+            return $this->json(['error' => 'Notification introuvable'], 404);
+        }
+
+        try {
+            $notificationService->markAsRead($notification);
+            return $this->json(['success' => true]);
+        } catch (\Throwable $e) {
+            return $this->json([
+                'error' => 'Erreur lors de la mise à jour',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }

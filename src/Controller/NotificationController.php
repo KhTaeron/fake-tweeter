@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Notification;
 use App\Repository\NotificationRepository;
 use App\Service\NotificationApiClientService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,7 +18,6 @@ class NotificationController extends AbstractController
     public function index(NotificationRepository $repo, SessionInterface $session, NotificationApiClientService $api): Response
     {
         $api->setTokenFromSession($session);
-        $user = $this->getUser();
         $notifs = $api->getNotifications();
 
         return $this->render('notification/index.html.twig', [
@@ -25,13 +25,19 @@ class NotificationController extends AbstractController
         ]);
     }
 
-    // #[Route('/{id}/read', name: 'notification_mark_read', methods: ['POST'])]
-    // public function markRead(Notification $notification): Response
-    // {
-    //     $notification->setIsRead(true);
-    //     $this->getDoctrine()->getManager()->flush();
+    #[Route('/{id}/read', name: 'notification_mark_read', methods: ['PUT'])]
+    public function markRead(int $id, Notification $notification, SessionInterface $session, NotificationApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+        $ok = $api->markAsRead($id);
 
-    //     return $this->redirectToRoute('notifications');
-    // }
+        if (!$ok) {
+            $this->addFlash('error', 'Impossible de mettre en lu');
+        } else {
+            $this->addFlash('success', 'Notification marquée comme lue');
+        }
+
+        return $this->redirectToRoute('get_notifications');
+    }
 
 }

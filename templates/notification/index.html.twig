@@ -22,6 +22,14 @@
                 Notification : {{ notif.type }}
             {% endif %}
 
+            {% if not notif.isRead %}
+                <span style="color: white; background: red; padding: 2px 6px; margin-left: 10px; border-radius: 4px;">
+                    Nouveau
+                </span>
+                <form method="put" action="{{ path('notification_mark_read', { id: notif.id }) }}">
+                    <button type="submit">Marquer comme lu</button>
+                </form>
+            {% endif %}
             <br>
             <small>le {{ notif.createdAt|date('d/m/Y H:i') }}</small>
         </li>
@@ -29,4 +37,5 @@
         <li>Aucune notification.</li>
     {% endfor %}
 </ul>
+
 {% endblock %}

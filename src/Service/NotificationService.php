@@ -25,6 +25,14 @@ class NotificationService
         $this->em->flush();
     }
 
+    public function markAsRead(Notification $notification): void
+    {
+        $notification->setIsRead(true);
+
+        $this->em->persist($notification);
+        $this->em->flush();
+    }
+
     public function formatNotification(Notification $notification): array
     {
         return [

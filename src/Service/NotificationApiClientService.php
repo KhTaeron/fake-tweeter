@@ -19,4 +19,9 @@ class NotificationApiClientService extends ApiClientBaseService
         return $this->fetchJson('/notifications');
     }
 
+    public function markAsRead($notifId): bool
+    {
+        return $this->putJson("/notifications/{$notifId}/read", data:[]);
+    }
+
 }
