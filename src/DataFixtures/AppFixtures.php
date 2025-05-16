@@ -1,14 +1,16 @@
 <?php
 namespace App\DataFixtures;
 
-use App\Entity\User;
 use App\Entity\Tweet;
 use App\Entity\Like;
 use App\Entity\Subscription;
+use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use DateTime;
 use Faker\Factory;
+use App\Entity\Notification;
 
 class AppFixtures extends Fixture
 {
@@ -42,6 +44,8 @@ class AppFixtures extends Fixture
             }
         }
 
+        $manager->flush();
+        
         // Create Likes
         foreach ($tweets as $tweet) {
             $liker = $users[array_rand($users)];
@@ -49,7 +53,22 @@ class AppFixtures extends Fixture
             $like->setLikedTweet($tweet);
             $like->setTweeter($liker);
             $like->setLikeDate(new DateTime());
+
             $manager->persist($like);
+
+            if ($liker !== $tweet->getTweeter()) {
+                $notif = new Notification();
+                $notif->setTarget($tweet->getTweeter());
+                $notif->setType('like');
+                $notif->setPayload([
+                    'tweetId' => $tweet->getId(),
+                    'liker' => $liker->getPseudo(),
+                    'likerId' => $liker->getId(),
+                ]);
+                $notif->setIsRead(false);
+                $notif->setCreatedAt(new DateTimeImmutable());
+                $manager->persist($notif);
+            }
         }
 
         // Create Subscriptions
@@ -61,6 +80,17 @@ class AppFixtures extends Fixture
                 $sub->setFollowedUser($followed);
                 $sub->setSubscriptionDate(new DateTime());
                 $manager->persist($sub);
+
+                $notif = new Notification();
+                $notif->setTarget($followed);
+                $notif->setType('follow');
+                $notif->setPayload([
+                    'follower' => $follower->getPseudo(),
+                    'followerId' => $follower->getId(),
+                ]);
+                $notif->setIsRead(false);
+                $notif->setCreatedAt(new DateTimeImmutable());
+                $manager->persist($notif);
             }
         }
 

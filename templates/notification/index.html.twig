@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block body %}
+<h1>Mes notifications</h1>
+
+<ul>
+    {% for notif in notifications %}
+        <li>
+            {{ notif.type|capitalize }} :
+            {% if notif.type == 'like' %}
+                Quelqu’un a aimé un tweet.
+            {% elseif notif.type == 'follow' %}
+                Vous avez un nouvel abonné !
+            {% endif %}
+
+            <small>le {{ notif.createdAt|date('d/m/Y H:i') }}</small>
+
+            {# {% if not notif.isRead %}
+                <form method="post" action="{{ path('notification_mark_read', { id: notif.id }) }}">
+                    <button>Marquer comme lu</button>
+                </form>
+            {% endif %} #}
+        </li>
+    {% else %}
+        <li>Aucune notification.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

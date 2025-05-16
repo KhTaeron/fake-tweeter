@@ -3,7 +3,6 @@
 namespace App\Controller\Api;
 
 use App\Repository\UserRepository;
-use App\Entity\User;
 use App\Service\TweetService;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -97,7 +96,7 @@ class TweetController extends AbstractController
         }
 
         try {
-                $tweetService->toggleLike($id, $user);
+            $tweetService->toggleLike($id, $user);
             return $this->json(['success' => true], 201);
         } catch (\Throwable $e) {
             return $this->json(['error' => $e->getMessage()], 400);

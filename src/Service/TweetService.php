@@ -2,11 +2,13 @@
 
 namespace App\Service;
 
+use App\Entity\Notification;
 use App\Entity\Tweet;
 use App\Entity\User;
 use App\Entity\Like;
 use App\Repository\TweetRepository;
 use App\Repository\LikeRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -196,6 +198,20 @@ class TweetService
             $like->setLikeDate(new \DateTime());
 
             $this->em->persist($like);
+
+            if ($user !== $tweet->getTweeter()) {
+                $notif = new Notification();
+                $notif->setTarget($tweet->getTweeter());
+                $notif->setType('like');
+                $notif->setPayload([
+                    'tweetId' => $tweet->getId(),
+                    'liker' => $user->getPseudo(),
+                    'likerId' => $user->getId(),
+                ]);
+                $notif->setIsRead(false);
+                $notif->setCreatedAt(new DateTimeImmutable());
+                $this->em->persist($notif);
+            }
         }
 
         $this->em->flush();
@@ -203,5 +219,4 @@ class TweetService
         // On retourne le nombre de likes après changement
         return count($tweet->getLikes());
     }
-
 }
