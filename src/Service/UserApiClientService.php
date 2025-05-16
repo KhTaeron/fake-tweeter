@@ -33,4 +33,9 @@ class UserApiClientService extends ApiClientBaseService
         return $this->delete('/users/me');
     }
 
+    public function toggleSubscription(int $targetUserId): bool
+    {
+        return $this->postJson("/users/{$targetUserId}/follow", []);
+    }
+
 }

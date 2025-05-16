@@ -27,14 +27,16 @@ class UserController extends AbstractController
     #[Route('/{id}', name: 'api_user_show', methods: ['GET'])]
     public function show(int $id, UserService $service): JsonResponse
     {
-        $user = $service->getById($id);
+        $currentUser = $this->getUser();
+        $data = $service->getById($id, $currentUser instanceof User ? $currentUser : null);
 
-        if (!$user) {
+        if (!$data) {
             return $this->json(['error' => 'Utilisateur introuvable'], 404);
         }
 
-        return $this->json($user);
+        return $this->json($data);
     }
+
 
     #[Route('/me', name: 'api_user_update_me', methods: ['PUT'])]
     public function updateMe(Request $request, UserService $service): JsonResponse
@@ -80,4 +82,25 @@ class UserController extends AbstractController
         }
     }
 
+    #[Route('/{id}/follow', name: 'toggle_user_subscription', methods: ['POST'])]
+    public function like(int $id, UserService $userService): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
+
+        try {
+            $count = $userService->toggleSubscription($id, $user);
+
+            return $this->json([
+                'success' => true,
+                'subscriptionsCount' => $count,
+            ]);
+
+        } catch (\Throwable $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
+        }
+    }
 }

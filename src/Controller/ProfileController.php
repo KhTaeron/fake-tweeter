@@ -83,15 +83,36 @@ class ProfileController extends AbstractController
     {
         $api->setTokenFromSession($session);
 
-        $user = $api->getUser($id);
+        $me = $api->getMe();
+        if ($me && $me['id'] === $id) {
+            return $this->redirectToRoute('profile_me');
+        }
 
+        $user = $api->getUser($id);
         if (!$user) {
             throw $this->createNotFoundException('Utilisateur introuvable');
         }
 
         return $this->render('profile/show.html.twig', [
             'user' => $user,
+            'selfProfile' => false,
         ]);
+    }
+
+    #[Route('/{id}/follow', name: 'profile_follow', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function follow(int $id, SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+
+        $success = $api->toggleSubscription($id);
+
+        if ($success) {
+            $this->addFlash('success', 'Action de suivi mise à jour.');
+        } else {
+            $this->addFlash('error', 'Impossible de mettre à jour le suivi.');
+        }
+
+        return $this->redirectToRoute('profile_show', ['id' => $id]);
     }
 
 }

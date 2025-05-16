@@ -1,6 +1,7 @@
 <?php
 namespace App\Service;
 
+use App\Entity\Subscription;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,15 +15,17 @@ class UserService
     ) {
     }
 
-    public function getById(int $id): ?array
+    public function getById(int $id, ?User $currentUser = null): ?array
     {
         $user = $this->userRepository->find($id);
+        return $user ? $this->formatUser($user, false, $currentUser) : null;
+    }
 
-        if (!$user) {
-            return null;
-        }
 
-        return $this->formatUser($user);
+    // Récupérer l'entité d'User
+    public function getUserEntityById(int $id): ?User
+    {
+        return $this->userRepository->find($id);
     }
 
     public function getMe(User $user): array
@@ -43,7 +46,7 @@ class UserService
         $this->entityManagerInterface->flush();
     }
 
-    private function formatUser(User $user, bool $includeApiKey = false): array
+    private function formatUser(User $user, bool $includeApiKey = false, ?User $currentUser = null): array
     {
         $data = [
             'id' => $user->getId(),
@@ -74,8 +77,15 @@ class UserService
             $data['apiKey'] = $user->getApiKey();
         }
 
+        if ($currentUser) {
+            $data['isFollowed'] =
+                $user->getId() !== $currentUser->getId()
+                && $user->isFollowedBy($currentUser);
+        }
+
         return $data;
     }
+
 
     public function register(string $pseudo, string $plainPassword, UserPasswordHasherInterface $hasher): User
     {
@@ -93,4 +103,40 @@ class UserService
 
         return $user;
     }
+
+    public function toggleSubscription(int $userToFollowId, User $user): int
+    {
+        if ($user->getId() === $userToFollowId) {
+            throw new \LogicException("Vous ne pouvez pas vous suivre vous-même.");
+        }
+
+        $userToFollow = $this->entityManagerInterface->getRepository(User::class)->find($userToFollowId);
+
+        if (!$userToFollow) {
+            throw new \RuntimeException('Utilisateur à suivre introuvable.');
+        }
+
+        $repo = $this->entityManagerInterface->getRepository(Subscription::class);
+
+        $subscription = $repo->findOneBy([
+            'followedUser' => $userToFollow,
+            'followingUser' => $user,
+        ]);
+
+        if ($subscription) {
+            $this->entityManagerInterface->remove($subscription);
+        } else {
+            $subscription = new Subscription();
+            $subscription->setFollowedUser($userToFollow);
+            $subscription->setFollowingUser($user);
+            $subscription->setSubscriptionDate(new \DateTime());
+
+            $this->entityManagerInterface->persist($subscription);
+        }
+
+        $this->entityManagerInterface->flush();
+
+        return count($user->getSubscriptions());
+    }
+
 }

@@ -190,4 +190,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // Laisse vide, sauf si tu stockes des informations sensibles que tu veux effacer
     }
 
+    public function isFollowedBy(User $other): bool
+    {
+        foreach ($this->followers as $subscription) {
+            if ($subscription->getFollowingUser()->getId() === $other->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
