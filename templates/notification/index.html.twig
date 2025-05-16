@@ -8,20 +8,22 @@
 <ul>
     {% for notif in notifications %}
         <li>
-            {{ notif.type|capitalize }} :
             {% if notif.type == 'like' %}
-                Quelqu’un a aimé un tweet.
+                <a href="{{ path('profile_show', { id: notif.payload.likerId }) }}">
+                    {{ notif.payload.liker }}
+                </a>
+                a aimé votre <a href="{{ path('tweet_detail', { id: notif.payload.tweetId }) }}">tweet</a>.
             {% elseif notif.type == 'follow' %}
-                Vous avez un nouvel abonné !
+                <a href="{{ path('profile_show', { id: notif.payload.followerId }) }}">
+                    {{ notif.payload.follower }}
+                </a>
+                vous suit maintenant.
+            {% else %}
+                Notification : {{ notif.type }}
             {% endif %}
 
+            <br>
             <small>le {{ notif.createdAt|date('d/m/Y H:i') }}</small>
-
-            {# {% if not notif.isRead %}
-                <form method="post" action="{{ path('notification_mark_read', { id: notif.id }) }}">
-                    <button>Marquer comme lu</button>
-                </form>
-            {% endif %} #}
         </li>
     {% else %}
         <li>Aucune notification.</li>
