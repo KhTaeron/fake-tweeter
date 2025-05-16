@@ -15,18 +15,28 @@
     <hr>
 
     <h2>Likes</h2>
-
     <ul>
-    {% for like in likes %}
-        <li>{{ like.pseudo }}</li>
-    {% else %}
-        <li>Aucun like pour ce tweet.</li>
-    {% endfor %}
+        {% for like in likes %}
+            <li>{{ like.pseudo }}</li>
+        {% else %}
+            <li>Aucun like pour ce tweet.</li>
+        {% endfor %}
     </ul>
 
     <form method="post" action="{{ path('tweet_like', { id: tweet.id }) }}">
         <button type="submit">❤️ Liker</button>
     </form>
+
+    {# templates/tweet/show.html.twig #}
+    
+    {% if tweet.isCurrentUser %}
+        <h2>Modifier le tweet</h2>
+        <form method="put" action="{{ path('update_post', { id: tweet.id }) }}">
+            <input type="hidden" name="_method" value="PUT">
+            <textarea name="content" rows="3" required>{{ tweet.content }}</textarea><br>
+            <button type="submit" class="tweet-button">Mettre à jour</button>
+        </form>
+    {% endif %}
 
     <a href="{{ path('tweets_home') }}">← Retour à l'exploration</a>
 </div>

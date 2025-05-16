@@ -76,15 +76,27 @@ class TweetController extends AbstractController
             new OA\Response(response: 404, description: 'Tweet introuvable')
         ]
     )]
-    public function show(int $id, TweetService $tweets): JsonResponse
+    public function show(int $id, TweetService $tweetService): JsonResponse
     {
-        $tweet = $tweets->getFullEntity($id);
+        $user =$this->getUser();
+
+        $tweet = $tweetService->getFullEntity($id);
+
+        $tweeter = $tweet->getTweeter();
 
         if (!$tweet) {
             return $this->json(['error' => 'Tweet introuvable'], 404);
         }
 
-        return $this->json($tweet);
+        $formattedTweet = $tweetService->formatTweet($tweet);
+
+        if ($tweeter == $user) {
+            $formattedTweet['isCurrentUser'] = true;
+        } else {
+            $formattedTweet['isCurrentUser'] = false;
+        }
+        
+        return $this->json($formattedTweet);
     }
 
     #[Route('/{id}/likes', name: 'tweet_like_add', methods: ['POST'])]
@@ -104,7 +116,7 @@ class TweetController extends AbstractController
         }
     }
 
-    #[Route('', methods: ['POST'], name: 'tweet_create')]
+    #[Route('/create', methods: ['POST'], name: 'tweet_create')]
     public function create(Request $request, TweetService $tweetService, UserRepository $users): JsonResponse
     {
         $user = $this->getUser();
@@ -123,20 +135,7 @@ class TweetController extends AbstractController
         }
 
     }
-
     #[Route('/{id}', methods: ['DELETE'], name: 'tweet_delete')]
-    #[OA\Delete(
-        path: '/tweets/{id}',
-        summary: 'Supprimer un tweet',
-        tags: ['Tweets'],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
-        ],
-        responses: [
-            new OA\Response(response: 204, description: 'Tweet supprimé'),
-            new OA\Response(response: 404, description: 'Tweet introuvable')
-        ]
-    )]
     public function delete(int $id, TweetService $tweets): JsonResponse
     {
         try {
@@ -147,20 +146,7 @@ class TweetController extends AbstractController
 
         return new JsonResponse(null, 204);
     }
-
     #[Route('/{id}/likes', methods: ['GET'], name: 'tweet_likes')]
-    #[OA\Get(
-        path: '/tweets/{id}/likes',
-        summary: 'Afficher les utilisateurs ayant liké un tweet',
-        tags: ['Tweets'],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'Liste des likes'),
-            new OA\Response(response: 404, description: 'Tweet introuvable')
-        ]
-    )]
     public function likes(int $id, TweetService $tweets): JsonResponse
     {
         try {
@@ -171,36 +157,22 @@ class TweetController extends AbstractController
 
         return $this->json($likes);
     }
-
-    #[Route('/{id}', methods: ['PUT'], name: 'tweet_update')]
-    #[OA\Put(
-        path: '/tweets/{id}',
-        summary: 'Modifier le contenu d’un tweet',
-        tags: ['Tweets'],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
-        ],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['content'],
-                properties: [
-                    new OA\Property(property: 'content', type: 'string', maxLength: 280)
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(response: 200, description: 'Tweet modifié'),
-            new OA\Response(response: 404, description: 'Tweet introuvable'),
-            new OA\Response(response: 422, description: 'Erreur de validation')
-        ]
-    )]
+    #[Route('/{id}/update', methods: ['PUT'], name: 'tweet_update')]
     public function update(int $id, Request $request, TweetService $tweets): JsonResponse
     {
+        
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
+
         $payload = $request->toArray();
 
         try {
-            $updated = $tweets->update($id, $payload);
+            $updated = $tweets->updateTweet($id, $payload, $user); // ⬅️ on passe $user
+
+        } catch (\RuntimeException $e) {
+            return $this->json(['error' => $e->getMessage()], 403);
         } catch (\RuntimeException $e) {
             return $this->json(['error' => $e->getMessage()], 404);
         } catch (\InvalidArgumentException $e) {

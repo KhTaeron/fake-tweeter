@@ -25,8 +25,6 @@ class TweetApiClientService extends ApiClientBaseService
         }
     }
 
-    
-
     public function getTweet(int $id): ?array
     {
         return $this->fetchJson("/tweets/$id");
@@ -44,8 +42,14 @@ class TweetApiClientService extends ApiClientBaseService
 
     public function createTweet(array $data): bool
     {
-        return $this->postJson('/tweets', $data);   // on envoie maintenant le contenu
+        return $this->postJson('/tweets/create', $data);
     }
+
+    public function updateTweet(int $id, array $data): bool
+    {
+        return $this->putJson("/tweets/$id/update", $data);
+    }
+
 
 
 }

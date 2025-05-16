@@ -46,4 +46,23 @@ class PostController extends AbstractController
         return $this->redirectToRoute('tweet_detail', ['id' => $id]);
     }
 
+    #[Route('/{id}/update', name: 'update_post', methods: ['PUT'])]
+    public function updateTweet(
+        int $id,
+        Request $request,
+        SessionInterface $session,
+        TweetApiClientService $api
+    ): Response {
+        $api->setTokenFromSession($session);
+
+        $content = $request->request->get('content');
+
+        $ok = $api->updateTweet($id, ['content' => $content]);
+
+        $this->addFlash($ok ? 'success' : 'error',
+            $ok ? 'Tweet modifié avec succès.' : 'Impossible de modifier le tweet.');
+
+        return $this->redirectToRoute('tweet_detail', ['id' => $id]);
+    }
+
 }

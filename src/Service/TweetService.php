@@ -8,6 +8,7 @@ use App\Entity\Like;
 use App\Repository\TweetRepository;
 use App\Repository\LikeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -75,7 +76,6 @@ class TweetService
             'tweeterId' => $author->getId(),
         ];
     }
-
     public function delete(int $id): void
     {
         /** @var ?Tweet $tweet */
@@ -90,7 +90,6 @@ class TweetService
         $this->em->remove($tweet);
         $this->em->flush();
     }
-
     public function getLikes(int $tweetId): array
     {
         $tweet = $this->em->getRepository(\App\Entity\Tweet::class)->find($tweetId);
@@ -109,13 +108,16 @@ class TweetService
             ];
         }, $likes->toArray());
     }
-
-    public function update(int $id, array $payload): array
+    public function updateTweet(int $id, array $payload, User $user): array
     {
         $tweet = $this->tweetRepository->find($id);
-
         if (!$tweet) {
             throw new \RuntimeException('Tweet introuvable');
+        }
+
+        if ($tweet->getTweeter()->getId() !== $user->getId()) {
+            throw new AccessDeniedException('Vous n’êtes pas autorisé à modifier ce tweet.');
+        
         }
 
         $violations = $this->validator->validate(
@@ -124,22 +126,16 @@ class TweetService
                 'content' => [new Assert\NotBlank(), new Assert\Length(max: 280)],
             ])
         );
-
-        if (count($violations) > 0) {
+        if (\count($violations) > 0) {
             throw new \InvalidArgumentException((string) $violations);
         }
 
         $tweet->setContent($payload['content']);
+        $this->em->persist($tweet);
         $this->em->flush();
 
-        return [
-            'id' => $tweet->getId(),
-            'content' => $tweet->getContent(),
-            'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
-            'tweeterId' => $tweet->getTweeter()->getId(),
-        ];
+        return $this->formatTweet($tweet);
     }
-
     public function search(string $keyword = ''): array
     {
         if ($keyword === '') {
@@ -148,18 +144,10 @@ class TweetService
 
         return $this->tweetRepository->searchByKeyword($keyword);
     }
-
-    public function getFullEntity(int $id): ?array
+    public function getFullEntity(int $id): ?Tweet
     {
-        $tweet = $this->tweetRepository->find($id);
-
-        if (!$tweet) {
-            return null;
-        }
-
-        return $this->formatTweet($tweet);
+        return $this->tweetRepository->find($id);
     }
-
     public function formatTweet(Tweet $tweet): array
     {
         return [
@@ -173,7 +161,6 @@ class TweetService
             'likeCount' => count($tweet->getLikes()),
         ];
     }
-
     public function toggleLike(int $tweetId, User $user): int
     {
         $tweet = $this->em->getRepository(Tweet::class)->find($tweetId);
