@@ -105,59 +105,23 @@ class TweetController extends AbstractController
     }
 
     #[Route('', methods: ['POST'], name: 'tweet_create')]
-    #[OA\Post(
-        path: '/tweets',
-        summary: 'Créer un nouveau tweet',
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['content', 'tweeterId'],
-                properties: [
-                    new OA\Property(property: 'content', type: 'string', maxLength: 280),
-                    new OA\Property(property: 'tweeterId', type: 'integer')
-                ]
-            )
-        ),
-        tags: ['Tweets'],
-        responses: [
-            new OA\Response(response: 201, description: 'Tweet créé'),
-            new OA\Response(response: 422, description: 'Erreur de validation'),
-            new OA\Response(response: 404, description: 'Utilisateur introuvable')
-        ]
-    )]
-    public function create(Request $request, TweetService $tweets, UserRepository $users, ValidatorInterface $validator): JsonResponse
+    public function create(Request $request, TweetService $tweetService, UserRepository $users): JsonResponse
     {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
+
         $payload = $request->toArray();
 
-        $violations = $validator->validate(
-            $payload,
-            new Assert\Collection([
-                'fields' => [
-                    'content' => [new Assert\NotBlank(), new Assert\Length(max: 280)],
-                    'tweeterId' => [new Assert\NotBlank(), new Assert\Positive()],
-                ],
-                'allowExtraFields' => true,
-            ])
-        );
-
-        if (\count($violations) > 0) {
-            return $this->json(['error' => (string) $violations], 422);
-        }
-
-        $user = $users->find($payload['tweeterId']);
-        if (!$user) {
-            return $this->json(['error' => 'Utilisateur introuvable'], 404);
-        }
-
         try {
-            $data = $tweets->create($payload, $user);
-        } catch (\InvalidArgumentException $e) {
-            return $this->json(['error' => $e->getMessage()], 422);
+                $tweetService->create($payload, $user);
+            return $this->json(['success' => true], 201);
+        } catch (\Throwable $e) {
+            return $this->json(['error' => $e->getMessage()], 400);
         }
 
-        return $this->json($data, 201, [
-            'Location' => $this->generateUrl('tweet_show', ['id' => $data['id']]),
-        ]);
     }
 
     #[Route('/{id}', methods: ['DELETE'], name: 'tweet_delete')]

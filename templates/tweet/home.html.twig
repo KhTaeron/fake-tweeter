@@ -8,12 +8,21 @@
 {% block body %}
 <div class="container">
     <h1 style="text-align: center;">Explorer les Tweets</h1>
-
-    <form method="get" action="{{ path('tweets_home') }}" class="search-bar">
-        <input type="text" name="q" placeholder="Rechercher un mot..." value="{{ keyword }}">
-        <button type="submit">Rechercher</button>
-    </form>
-
+    <div>
+        <div>
+            <form method="get" action="{{ path('tweets_home') }}" class="search-bar">
+                <input type="text" name="q" placeholder="Rechercher un mot..." value="{{ keyword }}">
+                <button type="submit">Rechercher</button>
+            </form>
+        </div>
+        <div class="new-tweet-box">
+            <form method="post" action="{{ path('tweet_create_submit') }}">
+                <textarea name="content"
+                        placeholder="Quoi de neuf ?" rows="3" required></textarea>
+                <button type="submit" class="tweet-button">Tweeter</button>
+            </form>
+        </div>
+    </div>
     {% if tweets is empty %}
         <p style="text-align: center; color: #657786;">Aucun tweet trouvé.</p>
     {% else %}
@@ -31,6 +40,5 @@
                 </a>
             </div>
         {% endfor %}
-    {% endif %}
-</div>
+    {% endif %} 
 {% endblock %}
