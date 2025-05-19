@@ -191,3 +191,127 @@ a:hover .follower {
 .back-button:hover {
     text-decoration: underline;
 }
+/* Bouton de follow dans l'en-tête */
+.follow-form {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+}
+
+.follow-button {
+    background-color: #ffcc00;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.follow-button:hover {
+    background-color: #e5b909;
+}
+
+.follow-button i {
+    font-size: 1rem;
+}
+
+.profile-actions {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+/* Boutons discrets */
+.edit-button,
+.delete-button {
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #3d3d3d;
+}
+
+.edit-button i,
+.delete-button i {
+    font-size: 1.1rem;
+}
+
+.profile-edit-form {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.profile-edit-form label {
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+.profile-edit-form input[type="text"],
+.profile-edit-form textarea,
+.profile-edit-form input[type="file"] {
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.profile-edit-form textarea {
+    resize: vertical;
+}
+
+.primary-button,
+.secondary-button {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.primary-button {
+    background-color: #ffcc00;
+    color: white;
+}
+
+.primary-button:hover {
+    background-color: #e5b909;
+}
+
+.secondary-button {
+    background-color: #e1e1e1;
+    color: #333;
+}
+
+.secondary-button:hover {
+    background-color: #ccc;
+}
+
+.warning {
+    font-size: 0.85rem;
+    color: #b91c1c;
+    margin-top: -0.5rem;
+}

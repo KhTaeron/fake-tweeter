@@ -11,6 +11,16 @@
 {% block body %}
 <div class="profile-card">
     <div class="profile-header-bg">
+        <form method="post" action="{{ path('profile_follow', {'id': user.id}) }}" class="follow-form">
+            <button type="submit" class="follow-button">
+                {% if user.isFollowed %}
+                    <i class="fa-solid fa-user-minus"></i> Ne plus suivre
+                {% else %}
+                    <i class="fa-solid fa-user-plus"></i> Suivre
+                {% endif %}
+            </button>
+        </form>
+
         <img class="profile-avatar" src="{{ user.avatar ? asset('uploads/avatars/' ~ user.avatar.path) : asset('images/default-avatar.webp') }}" alt="Avatar">
     </div>
 
@@ -51,17 +61,6 @@
             <p class="empty">Aucun tweet</p>
         {% endfor %}
     </div>
-
-    <form method="post" action="{{ path('profile_follow', {'id': user.id}) }}">
-        <button type="submit">
-            {% if user.isFollowed %}
-                ❌ Se désabonner
-            {% else %}
-                ➕ S’abonner
-            {% endif %}
-        </button>
-    </form>
-
 
 </div>
 {% endblock %}

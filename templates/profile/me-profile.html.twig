@@ -10,6 +10,20 @@
 {% block body %}
 <div class="profile-card">
     <div class="profile-header-bg">
+
+        <div class="profile-actions">
+            <a href="{{ path('profile_edit') }}" class="edit-button" title="Modifier le profil">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+
+            <form method="delete" action="{{ path('profile_delete') }}" onsubmit="return confirm('Supprimer votre compte ?')">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="delete-button" title="Supprimer le compte">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </form>
+        </div>
+        
         <img class="profile-avatar"
              src="{{ user.avatar ? asset('uploads/avatars/' ~ user.avatar.path) : asset('images/default-avatar.webp') }}"
              alt="Avatar">
@@ -52,14 +66,5 @@
             <p class="empty">Aucun tweet</p>
         {% endfor %}
     </div>
-
-    <form method="delete" action="{{ path('profile_delete') }}">
-        <input type="hidden" name="_method" value="DELETE">
-        <button type="submit" onclick="return confirm('Supprimer votre compte ?')">
-            🗑️ Supprimer mon compte
-        </button>
-    </form>
-
-    <a href="{{ path('profile_edit') }}" class="edit-link" title="Modifier le profil">✏️ Modifier mon profil</a>
 </div>
 {% endblock %}
