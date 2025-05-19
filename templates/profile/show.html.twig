@@ -17,10 +17,17 @@
 
 
     {% if user.avatar %}
-        <div class="profile-avatar">
-            <img src="{{ asset('uploads/avatars/' ~ user.avatar.path) }}" alt="Avatar de {{ user.pseudo }}" width="150" height="150">
-        </div>
+        <img src="{{ asset('uploads/avatars/' ~ user.avatar.path) }}" alt="Avatar" />
+
+        <script>
+            console.log("Avatar path:", "{{ asset('uploads/avatars/' ~ user.avatar.path) }}");
+        </script>
+    {% else %}
+        <script>
+            console.log("Aucun avatar pour cet utilisateur.");
+        </script>
     {% endif %}
+
 
     <ul class="profile-info">
         <li><strong>Pseudo :</strong> {{ user.pseudo }}</li>

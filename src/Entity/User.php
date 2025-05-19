@@ -30,7 +30,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTime $registrationDate = null;
 
-    #[ORM\OneToOne(inversedBy: 'user', targetEntity: File::class, cascade: ['persist'])]
+    #[ORM\OneToOne(targetEntity: File::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'avatar_id', referencedColumnName: 'id', nullable: true)]
     private ?File $avatar = null;
 
     /**

@@ -16,7 +16,18 @@
         <a href="{{ path('profile_edit') }}" class="edit-link" title="Modifier le profil">✏️</a>
     </div>
 
+    {% if user.avatar %}
+        <img src="{{ asset('uploads/avatars/' ~ user.avatar.path) }}" alt="Avatar" />
 
+        <script>
+            console.log("Avatar path:", "{{ asset('uploads/avatars/' ~ user.avatar.path) }}");
+        </script>
+    {% else %}
+        <script>
+            console.log("Aucun avatar pour cet utilisateur.");
+        </script>
+    {% endif %}
+    
     <ul class="profile-info">
         <li><strong>Pseudo :</strong> {{ user.pseudo }}</li>
         <li><strong>Date d'inscription :</strong> {{ user.registrationDate|date('d/m/Y') }}</li>

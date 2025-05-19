@@ -25,21 +25,6 @@ class File
     #[ORM\Column]
     private ?int $size = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false)] // <- obligatoire : chaque fichier doit avoir un utilisateur
-    private ?User $user = null;
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): static
-    {
-        $this->user = $user;
-        return $this;
-    }
-
     #[ORM\Column]
     private ?\DateTimeImmutable $uploadedAt = null;
 

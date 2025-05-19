@@ -83,12 +83,16 @@ class UserService
             ], $user->getSubscriptions()->toArray()),
 
         ];
-        
+
         if ($user->getAvatar()) {
+            $avatar = $user->getAvatar();
             $data['avatar'] = [
-                'path' => $user->getAvatar()->getPath(),
-                'url' => '/uploads/avatars/' . $user->getAvatar()->getPath(),
+                'path' => $avatar->getPath(),
+                'url' => '/uploads/avatars/' . $avatar->getPath(),
             ];
+        } else {
+            dump("NOTHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIINGGG");
+            $data['avatar'] = null;
         }
 
         if ($includeApiKey) {
