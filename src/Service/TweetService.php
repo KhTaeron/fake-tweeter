@@ -149,10 +149,13 @@ class TweetService
         $retweetOrigin = $tweet->getRetweetOrigin();
         $retweetOriginId = $retweetOrigin ? $retweetOrigin->getId() : null;
 
+        $retweetComment = $tweet->getCommentaire() ? $tweet->getCommentaire() : null;
+
         return [
             'id' => $tweet->getId(),
             'content' => $tweet->getContent(),
             'retweet_origin_id' => $retweetOriginId,
+            'retweet_comment' => $retweetComment,
             'publicationDate' => $tweet->getPublicationDate()->format('Y-m-d H:i:s'),
             'tweeter' => [
                 'id' => $tweet->getTweeter()->getId(),

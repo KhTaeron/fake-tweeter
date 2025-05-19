@@ -30,9 +30,12 @@
                     <div class="tweet-card">
                     
                         {% if tweet.retweet_origin_id %}
-                            <a href="{{ path('tweet_detail', { id: tweet.retweet_origin_id }) }}" class="republication-link">
-                                <span class="tweet-date"><i class="fa-solid fa-arrow-up-right-from-square"></i> Republication</span>
-                            </a>
+                            <div class="retweet_details">
+                                <a href="{{ path('tweet_detail', { id: tweet.retweet_origin_id }) }}" class="republication-link">
+                                    <span class="tweet-date"><i class="fa-solid fa-arrow-up-right-from-square"></i> Republication</span>
+                                </a>
+                                <span class="tweet-date">{{ tweet.retweet_comment }}</span>
+                            </div>
                         {% endif %}
                         <div class="tweet-header">
                             <strong>{{ tweet.tweeter.pseudo }}</strong>

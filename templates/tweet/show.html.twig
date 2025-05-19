@@ -1,69 +1,74 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/tweet.css') }}">
+{% endblock %}
+
 {% block title %}Tweet de {{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}{% endblock %}
 
 {% block sidebar_left %}
     {{ include('profile/_card.html.twig', { user: profileMe, showActions: true }) }}
 {% endblock %}
-{% block body %}
-<div class="container">
-    <h1>Tweet</h1>
 
-    <div class="tweet">
-        <strong>{{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}</strong><br>
-        <p>{{ tweet.content }}</p>
-        <small>{{ tweet.publicationDate|date('d/m/Y H:i') }}</small>
+{% block body %}
+<div class="tweet-detail-card">
+    <div class="tweet-header">
+        <h2>Tweet</h2>
+        <a href="{{ path('tweets_home') }}" class="back-link">← Retour</a>
     </div>
 
-    <hr>
+    <div class="tweet-card">
+        <div class="tweet-header">
+            <strong>@{{ tweet.tweeter.pseudo }}</strong>
+            <span class="tweet-date">{{ tweet.publicationDate|date('d/m/Y H:i') }}</span>
+        </div>
+        <p class="tweet-content">{{ tweet.content }}</p>
+    </div>
 
-    <h2>Likes</h2>
-    <ul>
-        {% for like in likes %}
-            <li>{{ like.pseudo }}</li>
-        {% else %}
-            <li>Aucun like pour ce tweet.</li>
-        {% endfor %}
-    </ul>
-
-    <form method="post" action="{{ path('like_post', { id: tweet.id }) }}">
-        <button type="submit">❤️ Liker</button>
-    </form>
-
-
-    <form method="post" action="{{ path('retweet_post', { id: tweet.id }) }}">
-        <textarea name="content" rows="2" placeholder="Ajouter un commentaire (facultatif)" class="w-full p-2 mb-2 border border-gray-300 rounded"></textarea>
-
-        <button type="submit" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full">
-            🔁 Retweeter avec commentaire
-        </button>
-    </form>
-
-
-
-
-    {# templates/tweet/show.html.twig #}
-    
-    {% if tweet.isCurrentUser %}
-        <h2>Modifier le tweet</h2>
-        <form method="put" action="{{ path('update_post', { id: tweet.id }) }}">
-            <input type="hidden" name="_method" value="PUT">
-            <textarea name="content" rows="3" required>{{ tweet.content }}</textarea><br>
-            <button type="submit" class="tweet-button">Mettre à jour</button>
-        </form>
-    {% endif %}
-
-    {% if tweet.isCurrentUser %}
-        <form method="delete" action="{{ path('delete_post', { id: tweet.id }) }}">
-            <input type="hidden" name="_method" value="DELETE">
-            <button type="submit" onclick="return confirm('Supprimer votre tweet ?')">
-                🗑️ Supprimer mon tweet
+    <div class="tweet-actions">
+        <form method="post" action="{{ path('like_post', { id: tweet.id }) }}">
+            <button type="submit" class="like-button">
+                ❤️ Liker ({{ likes|length }})
             </button>
         </form>
+    </div>
+
+    <div class="retweet-form">
+        <form method="post" action="{{ path('retweet_post', { id: tweet.id }) }}">
+            <textarea name="content" rows="2" placeholder="Ajouter un commentaire (facultatif)"></textarea>
+            <button type="submit" class="retweet-button">
+                🔁 Retweeter
+            </button>
+        </form>
+    </div>
+
+    {% if tweet.isCurrentUser %}
+        <div class="tweet-edit-section">
+            <h3>Modifier le tweet</h3>
+            <form method="post" action="{{ path('update_post', { id: tweet.id }) }}">
+                <input type="hidden" name="_method" value="PUT">
+                <textarea name="content" rows="3" required>{{ tweet.content }}</textarea>
+                <button type="submit" class="update-button">💾 Sauvegarder</button>
+            </form>
+
+            <form method="post" action="{{ path('delete_post', { id: tweet.id }) }}" onsubmit="return confirm('Supprimer ce tweet ?')">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="delete-tweet-button">🗑️ Supprimer</button>
+            </form>
+        </div>
     {% endif %}
 
-
-
-    <a href="{{ path('tweets_home') }}">← Retour à l'exploration</a>
+    <div class="tweet-likes-list">
+        <h3>Likes</h3>
+        {% if likes %}
+            <ul>
+                {% for like in likes %}
+                    <li>@{{ like.pseudo }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty">Aucun like pour ce tweet.</p>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
