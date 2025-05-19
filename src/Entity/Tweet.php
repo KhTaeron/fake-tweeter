@@ -32,6 +32,10 @@ class Tweet
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'likedTweet', orphanRemoval: true, cascade: ['remove'])]
     private Collection $likes;
 
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(name: "retweet_origin_id", referencedColumnName: "id", onDelete: "SET NULL", nullable: true)]
+    private ?Tweet $retweetOrigin = null;
+
     public function __construct()
     {
         $this->likes = new ArrayCollection();
@@ -105,6 +109,17 @@ class Tweet
             }
         }
 
+        return $this;
+    }
+
+        public function getRetweetOrigin(): ?Tweet
+    {
+        return $this->retweetOrigin;
+    }
+
+    public function setRetweetOrigin(?Tweet $tweet): self
+    {
+        $this->retweetOrigin = $tweet;
         return $this;
     }
 }

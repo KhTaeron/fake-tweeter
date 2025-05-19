@@ -71,4 +71,20 @@ class PostController extends AbstractController
         return $this->redirectToRoute('tweets_home', ['id' => $id]);
     }
 
+    #[Route('/{id}/retweet', name: 'retweet_post', methods: ['POST'])]
+    public function retweetTweet(int $id, Request $request, SessionInterface $session, TweetApiClientService $api ): Response {
+        $api->setTokenFromSession($session);
+
+        $ok = $api->retweetTweet([
+        'original_tweet_id' => $id,
+        ]);
+
+
+        $this->addFlash($ok ? 'success' : 'error',
+            $ok ? 'Tweet modifié avec succès.' : 'Impossible de modifier le tweet.');
+
+        return $this->redirectToRoute('tweets_home');
+
+    }
+
 }

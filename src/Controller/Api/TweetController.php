@@ -193,7 +193,44 @@ class TweetController extends AbstractController
     }
 
 
+    #[Route('/retweet', methods: ['POST'], name: 'tweet_retweet')]
+    public function retweetTweet(Request $request, TweetService $tweetService): JsonResponse
+    {
+        $user = $this->getUser();
 
+        if (!$user) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
 
+        $payload = $request->toArray();
+
+        // Vérification minimale : ID du tweet à retweeter
+        if (!isset($payload['original_tweet_id'])) {
+            return $this->json(['error' => 'Tweet original manquant'], 400);
+        }
+
+        try {
+            $retweet = $tweetService->retweet($payload, $user);
+
+            return $this->json([
+                'success' => true,
+                'retweet_id' => $retweet['id'],
+            ], 201);
+
+        } catch (\InvalidArgumentException $e) {
+            return $this->json(['error' => $e->getMessage()], 422);
+        } catch (\RuntimeException $e) {
+            return $this->json(['error' => $e->getMessage()], 404);
+        } catch (\Throwable $e) {
+            return $this->json([
+                'error' => 'Erreur interne',
+                'type' => get_class($e),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ], 500);
+        }
+        
+    }
 
 }

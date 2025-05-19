@@ -193,4 +193,42 @@ class TweetService
         return count($tweet->getLikes());
     }
 
+    public function retweet(array $payload, User $author): array
+{
+    $violations = $this->validator->validate(
+        $payload,
+        new Assert\Collection([
+            'allowExtraFields' => true,
+            'fields' => [
+                'original_tweet_id' => [new Assert\NotBlank()],
+            ],
+        ])
+    );
+
+    if (count($violations) > 0) {
+        throw new \InvalidArgumentException((string) $violations);
+    }
+
+    $origin = $this->tweetRepository->find($payload['original_tweet_id']);
+    if (!$origin) {
+        throw new \RuntimeException('Tweet original introuvable');
+    }
+
+    $tweet = (new Tweet())
+        ->setPublicationDate(new \DateTime())
+        ->setTweeter($author)
+        ->setRetweetOrigin($origin)
+        ->setContent(null); // ✅ aucun contenu
+
+    $this->em->persist($tweet);
+    $this->em->flush();
+
+    return [
+        'id' => $tweet->getId(),
+        'content' => $tweet->getContent(),
+        'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
+        'tweeterId' => $author->getId(),
+    ];
+}
+
 }

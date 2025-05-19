@@ -27,6 +27,16 @@
         <button type="submit">❤️ Liker</button>
     </form>
 
+
+        <form method="post" action="{{ path('retweet_post', { id: tweet.id }) }}">
+            <button type="submit" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full">
+                🔁 Retweeter
+            </button>
+        </form>
+
+
+
+
     {# templates/tweet/show.html.twig #}
     
     {% if tweet.isCurrentUser %}
@@ -46,6 +56,7 @@
             </button>
         </form>
     {% endif %}
+
 
 
     <a href="{{ path('tweets_home') }}">← Retour à l'exploration</a>

@@ -55,6 +55,10 @@ class TweetApiClientService extends ApiClientBaseService
         return $this->delete("/tweets/$id/delete");
     }
 
+    public function retweetTweet(array $data): bool
+    {
+        return $this->postJson('/tweets/retweet', $data);
+    }
 
 
 }
