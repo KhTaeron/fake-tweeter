@@ -2,16 +2,22 @@
 {% block title %}Inscription{% endblock %}
 
 {% block body %}
-<h1>Créer un compte</h1>
+<div class="container">
+    <h1>Créer un compte</h1>
 
-<form method="post" action="{{ path('register_submit') }}">
-    <label for="pseudo">Pseudo :</label>
-    <input type="text" name="pseudo" required>
+    <form method="post" action="{{ path('register_submit') }}">
+        <label for="pseudo">Pseudo :</label>
+        <input type="text" name="pseudo" required>
 
-    <label for="password">Mot de passe :</label>
-    <input type="password" name="password" required>
+        <label for="password">Mot de passe :</label>
+        <input type="password" name="password" required>
 
-    <button type="submit">S'inscrire</button>
-</form>
+        <button type="submit">S'inscrire</button>
+
+        <p style="margin-top: 1rem;">
+            Vous avez déjà un compte ? <a href="{{ path('login_form') }}" class="back-button">Connectez-vous !</a>
+        </p>
+    </form>
+</div>
 
 {% endblock %}

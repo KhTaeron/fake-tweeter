@@ -18,6 +18,10 @@
         <input type="password" id="password" name="password" required><br><br>
 
         <button type="submit">Se connecter</button>
+
+        <p style="margin-top: 1rem;">
+            Pas encore de compte ? <a href="{{ path('register_form') }}" class="back-button">Créer un compte</a>
+        </p>
     </form>
 </div>
 {% endblock %}

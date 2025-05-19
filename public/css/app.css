@@ -57,3 +57,14 @@ body.app-layout {
     padding: 1rem 2rem;
     overflow-y: auto;
 }
+
+.back-button {
+    display: inline-block;
+    margin-top: 1rem;
+    text-decoration: none;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+.back-button:hover {
+    text-decoration: underline;
+}
