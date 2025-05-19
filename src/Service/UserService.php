@@ -5,6 +5,8 @@ use App\Entity\File;
 use App\Entity\Notification;
 use App\Entity\Subscription;
 use App\Entity\User;
+use App\Entity\Tweet;
+use App\Entity\Like;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -63,6 +65,24 @@ class UserService
 
     public function deleteUser(User $user): void
     {
+        // Supprimer les likes liés à l'utilisateur
+    $likes = $this->entityManagerInterface->getRepository(Like::class)->findBy(['tweeter' => $user]);
+    foreach ($likes as $like) {
+        $this->entityManagerInterface->remove($like);
+    }
+
+    // Supprimer les notifications liées à l'utilisateur
+    $notifications = $this->entityManagerInterface->getRepository(Notification::class)->findBy(['target' => $user]);
+    foreach ($notifications as $notif) {
+        $this->entityManagerInterface->remove($notif);
+    }
+
+    // Supprimer les tweets de l'utilisateur
+    $tweets = $this->entityManagerInterface->getRepository(Tweet::class)->findBy(['tweeter' => $user]);
+    foreach ($tweets as $tweet) {
+        $this->entityManagerInterface->remove($tweet);
+    }
+
         $this->entityManagerInterface->remove($user);
         $this->entityManagerInterface->flush();
     }

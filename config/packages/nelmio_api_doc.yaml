@@ -5,3 +5,12 @@ nelmio_api_doc:
             title: 'API de mon projet'
             description: 'Documentation de l’API'
             version: '1.0.0'
+
+        components:
+            securitySchemes:
+                bearerAuth:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - bearerAuth: []
