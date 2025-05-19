@@ -9,17 +9,46 @@
 
 
 {% block body %}
-<div class="profile-container">
-    <div class="profile-header">
-        <a href="{{ path('tweets_home') }}" class="home-link">← Retour aux tweets</a>
-        <h1>@{{ user.pseudo }}</h1>
+<div class="profile-card">
+    <div class="profile-header-bg">
+        <form method="post" action="{{ path('profile_follow', {'id': user.id}) }}" class="follow-form">
+            <button type="submit" class="follow-button">
+                {% if user.isFollowed %}
+                    <i class="fa-solid fa-user-minus"></i> Ne plus suivre
+                {% else %}
+                    <i class="fa-solid fa-user-plus"></i> Suivre
+                {% endif %}
+            </button>
+        </form>
+
+        <img class="profile-avatar" src="{{ user.avatar ? asset('uploads/avatars/' ~ user.avatar.path) : asset('images/default-avatar.webp') }}" alt="Avatar">
     </div>
 
+    <div class="profile-stats">
+        <a href="{{ path('profile_followers', {'id': user.id}) }}">
+            <div>
+                <strong>{{ user.followerCount }}</strong><br>
+                <span>Followers</span>
+            </div>
+        </a>
+        <a href="{{ path('profile_following', {'id': user.id}) }}">
+            <div>
+                <strong>{{ user.subscriptionCount }}</strong><br>
+                <span>Following</span>
+            </div>
+        </a>
+    </div>
 
-    <ul class="profile-info">
-        <li><strong>Pseudo :</strong> {{ user.pseudo }}</li>
-        <li><strong>Date d'inscription :</strong> {{ user.registrationDate|date('d/m/Y') }}</li>
-    </ul>
+    <div class="profile-identity">
+        <h2>{{ user.fullName ? user.fullName : user.pseudo }}</h2>
+        <p class="username">@{{ user.pseudo|lower }}</p>
+
+        {% if user.description %}
+            <p class="bio">{{ user.description }}</p>
+        {% else %}
+            <p class="bio empty">Ce profil n’a pas encore de description.</p>
+        {% endif %}
+    </div>
 
     <div>
         <div class="section-title">Tweets</div>
@@ -32,43 +61,6 @@
             <p class="empty">Aucun tweet</p>
         {% endfor %}
     </div>
-
-    <div>
-        <div class="section-title">Abonnements</div>
-        {% for subscription in user.subscriptions %}
-            <a href="{{ path('profile_show', {'id': subscription.followedUser.id}) }}">
-                <div class="following">
-                        {{ subscription.followedUser.pseudo }}
-                </div>
-            </a>
-        {% else %}
-            <p class="empty">Aucun abonnement</p>
-        {% endfor %}
-    </div>
-
-    <div>
-        <div class="section-title">Abonnés</div>
-        {% for subscription in user.followers %}
-            <a href="{{ path('profile_show', {'id': subscription.followingUser.id}) }}">
-                <div class="follower">
-                        {{ subscription.followingUser.pseudo }}
-                </div>
-            </a>
-        {% else %}
-            <p class="empty">Aucun abonné</p>
-        {% endfor %}
-    </div>
-
-    <form method="post" action="{{ path('profile_follow', {'id': user.id}) }}">
-        <button type="submit">
-            {% if user.isFollowed %}
-                ❌ Se désabonner
-            {% else %}
-                ➕ S’abonner
-            {% endif %}
-        </button>
-    </form>
-
 
 </div>
 {% endblock %}

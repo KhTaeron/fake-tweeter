@@ -3,10 +3,12 @@ namespace App\Controller;
 
 use App\Service\UserApiClientService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/profile')]
 class ProfileController extends AbstractController
@@ -27,6 +29,44 @@ class ProfileController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/followers', name: 'profile_followers', requirements: ['id' => '\d+'])]
+    public function followers(int $id, SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+
+        $user = $api->getUser($id);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur introuvable.');
+        }
+
+        $followers = $api->getFollowers($id);
+
+        return $this->render('profile/followers.html.twig', [
+            'user' => $user,
+            'followers' => $followers,
+        ]);
+    }
+
+    #[Route('/{id}/following', name: 'profile_following', requirements: ['id' => '\d+'])]
+    public function following(int $id, SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+
+        $user = $api->getUser($id);id: 
+
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur introuvable.');
+        }
+
+        $subscriptions = $api->getSubscriptions($id);
+
+        return $this->render('profile/following.html.twig', [
+            'user' => $user,
+            'subscriptions' => $subscriptions,
+        ]);
+    }
+
     #[Route('/edit', name: 'profile_edit')]
     public function edit(SessionInterface $session, UserApiClientService $api): Response
     {
@@ -34,13 +74,32 @@ class ProfileController extends AbstractController
         $user = $api->getMe();
 
         if (!$user) {
-            return $this->redirectToRoute('form_login');
+            return $this->redirectToRoute('login_form');
         }
 
         // Tu pourrais pré-remplir un formulaire ici
         return $this->render('profile/edit.html.twig', [
             'user' => $user,
         ]);
+    }
+
+    #[Route('/update/avatar', name: 'profile_update_avatar', methods: ['POST'])]
+    public function updateAvatar(Request $request, SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+
+        $avatarFile = $request->files->get('avatar');
+
+        if (!$avatarFile) {
+            $this->addFlash('error', 'Aucun fichier envoyé.');
+            return $this->redirectToRoute('profile_me');
+        }
+
+        $success = $api->uploadAvatar($avatarFile);
+
+        $this->addFlash($success ? 'success' : 'error', $success ? 'Avatar mis à jour.' : 'Erreur lors de l’envoi de l’avatar.');
+
+        return $this->redirectToRoute('profile_me');
     }
 
     #[Route('/update', name: 'profile_update', methods: ['POST'])]
@@ -50,6 +109,8 @@ class ProfileController extends AbstractController
 
         $data = [
             'pseudo' => $request->request->get('pseudo'),
+            'fullName' => $request->request->get('fullName'),
+            'description' => $request->request->get('description'),
         ];
 
         $success = $api->updateMe($data);

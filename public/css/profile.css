@@ -5,49 +5,6 @@ body {
     margin: 0;
 }
 
-.profile-container {
-    max-width: 600px;
-    margin: 40px auto;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    padding: 24px;
-}
-
-.profile-header {
-    text-align: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 16px;
-}
-
-.home-link {
-    display: inline-block;
-    margin-bottom: 10px;
-    font-size: 0.9em;
-    color: #3366cc;
-    text-decoration: none;
-}
-
-.home-link:hover {
-    text-decoration: underline;
-}
-
-
-.profile-header h1 {
-    margin: 0;
-    font-size: 28px;
-}
-
-.profile-info {
-    padding: 16px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.profile-info li {
-    list-style: none;
-    margin-bottom: 8px;
-}
-
 .section-title {
     font-weight: 600;
     margin: 20px 0 10px;
@@ -60,6 +17,8 @@ body {
     border-radius: 8px;
     padding: 10px 14px;
     margin-bottom: 8px;
+    color: #1c1c1c;
+    text-align: left;
 }
 
 .tweet time {
@@ -90,4 +49,269 @@ a:hover .following,
 a:hover .follower {
     background-color: #e2e2e2;
     cursor: pointer;
+}
+
+.profile-card {
+    background-color: #1c1c1c;
+    border-radius: 20px;
+    color: #fff;
+    width: 30vw;
+    margin: 2rem auto;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+    font-family: 'Segoe UI', sans-serif;
+    position: relative;
+}
+
+.profile-header-bg {
+    background: radial-gradient(circle, #ffcc00 0%, #1c1c1c 65%);
+    height: 100px;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid #1c1c1c;
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    object-fit: cover;
+    background-color: #000;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 50px;
+    margin-bottom: 1rem;
+}
+
+.profile-stats strong {
+    font-size: 1.2rem;
+}
+
+.profile-stats span {
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+.profile-identity h2 {
+    margin: 0.5rem 0 0;
+    font-size: 1.4rem;
+}
+
+.profile-identity .username {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 0.5rem;
+}
+
+.profile-identity .bio {
+    font-size: 0.9rem;
+    margin: 0.5rem auto;
+    max-width: 80%;
+    color: #ddd;
+}
+
+.profile-button {
+    background-color: #2e2e2e;
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 12px;
+    margin-top: 1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.3s ease;
+}
+
+.profile-button:hover {
+    background-color: #444;
+}
+.profile-stats a {
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+    text-align: center;
+}
+
+.profile-stats a:hover {
+    opacity: 0.8;
+}
+
+.user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 0;
+}
+
+.user-card {
+    background-color: #2a2a2a;
+    border-radius: 16px;
+    text-align: center;
+    padding: 1rem 0.5rem;
+    text-decoration: none;
+    color: #fff;
+    transition: background-color 0.2s ease;
+}
+
+.user-card:hover {
+    background-color: #3a3a3a;
+}
+
+.user-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+    border: 2px solid #444;
+}
+
+.user-pseudo {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #ddd;
+}
+
+.back-button {
+    display: inline-block;
+    margin-top: 1rem;
+    text-decoration: none;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+.back-button:hover {
+    text-decoration: underline;
+}
+/* Bouton de follow dans l'en-tête */
+.follow-form {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+}
+
+.follow-button {
+    background-color: #ffcc00;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.follow-button:hover {
+    background-color: #e5b909;
+}
+
+.follow-button i {
+    font-size: 1rem;
+}
+
+.profile-actions {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+/* Boutons discrets */
+.edit-button,
+.delete-button {
+    background: transparent;
+    border: none;
+    color: #666;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #3d3d3d;
+}
+
+.edit-button i,
+.delete-button i {
+    font-size: 1.1rem;
+}
+
+.profile-edit-form {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.profile-edit-form label {
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+.profile-edit-form input[type="text"],
+.profile-edit-form textarea,
+.profile-edit-form input[type="file"] {
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.profile-edit-form textarea {
+    resize: vertical;
+}
+
+.primary-button,
+.secondary-button {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.primary-button {
+    background-color: #ffcc00;
+    color: white;
+}
+
+.primary-button:hover {
+    background-color: #e5b909;
+}
+
+.secondary-button {
+    background-color: #e1e1e1;
+    color: #333;
+}
+
+.secondary-button:hover {
+    background-color: #ccc;
+}
+
+.warning {
+    font-size: 0.85rem;
+    color: #b91c1c;
+    margin-top: -0.5rem;
 }

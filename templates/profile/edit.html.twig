@@ -1,15 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier mon pseudo{% endblock %}
+{% block title %}Modifier mon profil{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+{% endblock %}
 
 {% block body %}
-    <h1>Modifier mon pseudo</h1>
+<div class="profile-card">
+    <div class="profile-header-bg">
+        <img class="profile-avatar"
+             src="{{ user.avatar ? asset('uploads/avatars/' ~ user.avatar.path) : asset('images/default-avatar.webp') }}"
+             alt="Avatar">
+    </div>
 
-    <form method="post" action="{{ path('profile_update') }}">
-        <label for="pseudo">Pseudo</label>
-        <p>Attention, vous serez déconnecté après avoir modifié votre pseudo - Veuillez vous reconnecter avec le nouveau pseudo.</p>
-        <input type="text" name="pseudo" id="pseudo" value="{{ user.pseudo }}" required>
+    <div class="profile-edit-form">
+        <h2>Modifier mon profil</h2>
 
-        <button type="submit">Enregistrer</button>
-    </form>
+        <form method="post" action="{{ path('profile_update') }}">
+            <label for="pseudo">Pseudo</label>
+            <input type="text" name="pseudo" id="pseudo" value="{{ user.pseudo }}" required>
+
+            <label for="fullName">Nom complet</label>
+            <input type="text" name="fullName" id="fullName" value="{{ user.fullName }}">
+
+            <label for="description">Description</label>
+            <textarea name="description" id="description" rows="3">{{ user.description }}</textarea>
+
+            <p class="warning">⚠️ Attention, vous serez déconnecté après avoir modifié votre pseudo.</p>
+
+            <button type="submit" class="primary-button">
+                <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+            </button>
+        </form>
+
+        <h3>Changer l’avatar</h3>
+        <form method="post" action="{{ path('profile_update_avatar') }}" enctype="multipart/form-data">
+            <input type="file" name="avatar" accept="image/*">
+            <button type="submit" class="secondary-button">
+                <i class="fa-solid fa-upload"></i> Mettre à jour l’avatar
+            </button>
+        </form>
+
+        <a href="{{ path('profile_me') }}" class="back-button">← Retour au profil</a>
+    </div>
+</div>
 {% endblock %}

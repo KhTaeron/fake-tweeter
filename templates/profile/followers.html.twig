@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+{% block title %}Abonnés de {{ user.pseudo }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="profile-card">
+    <h2>Abonnés de {{ user.pseudo }}</h2>
+
+    {% if followers is not empty %}
+        <div class="user-grid">
+            {% for follower in followers %}
+                <a href="{{ path('profile_show', {'id': follower.id}) }}" class="user-card">
+                    <img class="user-avatar"
+                         src="{{ follower.avatar
+                            ? asset('uploads/avatars/' ~ follower.avatar.path)
+                            : asset('images/default-avatar.webp') }}"
+                         alt="Avatar">
+                    <div class="user-pseudo">@{{ follower.pseudo }}</div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty">Aucun abonné.</p>
+    {% endif %}
+
+    <a href="{{ path('profile_show', {'id': user.id}) }}" class="back-button">← Retour au profil</a>
+</div>
+{% endblock %}

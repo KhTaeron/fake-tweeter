@@ -1,6 +1,7 @@
 <?php
 namespace App\Service;
 
+use App\Entity\File;
 use App\Entity\Notification;
 use App\Entity\Subscription;
 use App\Entity\User;
@@ -35,9 +36,27 @@ class UserService
         return $this->formatUser($user, true);
     }
 
-    public function updateUser(User $user, string $pseudo): void
+    public function updateUser(User $user, ?string $pseudo, ?string $fullName, ?string $description): void
     {
-        $user->setPseudo($pseudo);
+        if ($pseudo !== null && trim($pseudo) !== '') {
+            $user->setPseudo($pseudo);
+        }
+
+        if ($fullName !== null && trim($fullName) !== '') {
+            $user->setFullName($fullName);
+        }
+
+        if ($description !== null && trim($description) !== '') {
+            $user->setDescription($description);
+        }
+
+        $this->entityManagerInterface->persist($user);
+        $this->entityManagerInterface->flush();
+    }
+
+    public function updateUserAvatar(User $user, File $avatar): void
+    {
+        $user->setAvatar($avatar);
         $this->entityManagerInterface->persist($user);
         $this->entityManagerInterface->flush();
     }
@@ -53,6 +72,8 @@ class UserService
         $data = [
             'id' => $user->getId(),
             'pseudo' => $user->getPseudo(),
+            'fullName' => $user->getFullName(),
+            'description' => $user->getDescription(),
             'registrationDate' => $user->getRegistrationDate()->format('Y-m-d'),
             'tweets' => array_map(fn($tweet) => [
                 'id' => $tweet->getId(),
@@ -60,20 +81,19 @@ class UserService
                 'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
             ], $user->getTweets()->toArray()),
 
-            'followers' => array_map(fn($subscription) => [
-                'followingUser' => [
-                    'id' => $subscription->getFollowingUser()->getId(),
-                    'pseudo' => $subscription->getFollowingUser()->getPseudo(),
-                ]
-            ], $user->getFollowers()->toArray()),
-
-            'subscriptions' => array_map(fn($subscription) => [
-                'followedUser' => [
-                    'id' => $subscription->getFollowedUser()->getId(),
-                    'pseudo' => $subscription->getFollowedUser()->getPseudo(),
-                ]
-            ], $user->getSubscriptions()->toArray()),
+            'followerCount' => $user->getFollowers()->count(),
+            'subscriptionCount' => $user->getSubscriptions()->count(),
         ];
+
+        if ($user->getAvatar()) {
+            $avatar = $user->getAvatar();
+            $data['avatar'] = [
+                'path' => $avatar->getPath(),
+                'url' => '/uploads/avatars/' . $avatar->getPath(),
+            ];
+        } else {
+            $data['avatar'] = null;
+        }
 
         if ($includeApiKey) {
             $data['apiKey'] = $user->getApiKey();
@@ -150,6 +170,40 @@ class UserService
         $this->entityManagerInterface->flush();
 
         return count($user->getSubscriptions());
+    }
+
+    public function getFollowers(User $user): array
+    {
+        return array_map(function (Subscription $subscription) {
+            $u = $subscription->getFollowingUser();
+            return [
+                'id' => $u->getId(),
+                'pseudo' => $u->getPseudo(),
+                'avatar' => $u->getAvatar()
+                    ? [
+                        'path' => $u->getAvatar()->getPath(),
+                        'url' => '/uploads/avatars/' . $u->getAvatar()->getPath(),
+                    ]
+                    : null,
+            ];
+        }, $user->getFollowers()->toArray());
+    }
+
+    public function getFollowing(User $user): array
+    {
+        return array_map(function (Subscription $subscription) {
+            $u = $subscription->getFollowedUser();
+            return [
+                'id' => $u->getId(),
+                'pseudo' => $u->getPseudo(),
+                'avatar' => $u->getAvatar()
+                    ? [
+                        'path' => $u->getAvatar()->getPath(),
+                        'url' => '/uploads/avatars/' . $u->getAvatar()->getPath(),
+                    ]
+                    : null,
+            ];
+        }, $user->getSubscriptions()->toArray());
     }
 
 }
