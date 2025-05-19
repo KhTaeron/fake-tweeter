@@ -16,14 +16,18 @@
     </div>
 
     <div class="profile-stats">
-        <div>
-            <strong>{{ user.followers|length }}</strong><br>
-            <span>Followers</span>
-        </div>
-        <div>
-            <strong>{{ user.subscriptions|length }}</strong><br>
-            <span>Following</span>
-        </div>
+        <a href="{{ path('profile_followers', {'id': user.id}) }}">
+            <div>
+                <strong>{{ user.followerCount }}</strong><br>
+                <span>Followers</span>
+            </div>
+        </a>
+        <a href="{{ path('profile_following', {'id': user.id}) }}">
+            <div>
+                <strong>{{ user.subscriptionCount }}</strong><br>
+                <span>Following</span>
+            </div>
+        </a>
     </div>
 
     <div class="profile-identity">

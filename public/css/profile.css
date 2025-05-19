@@ -5,49 +5,6 @@ body {
     margin: 0;
 }
 
-/* .profile-container {
-    max-width: 600px;
-    margin: 40px auto;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    padding: 24px;
-}
-
-.profile-header {
-    text-align: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 16px;
-}
-
-.home-link {
-    display: inline-block;
-    margin-bottom: 10px;
-    font-size: 0.9em;
-    color: #3366cc;
-    text-decoration: none;
-}
-
-.home-link:hover {
-    text-decoration: underline;
-}
-
-
-.profile-header h1 {
-    margin: 0;
-    font-size: 28px;
-}
-
-.profile-info {
-    padding: 16px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.profile-info li {
-    list-style: none;
-    margin-bottom: 8px;
-} */
-
 .section-title {
     font-weight: 600;
     margin: 20px 0 10px;
@@ -60,6 +17,8 @@ body {
     border-radius: 8px;
     padding: 10px 14px;
     margin-bottom: 8px;
+    color: #1c1c1c;
+    text-align: left;
 }
 
 .tweet time {
@@ -96,7 +55,7 @@ a:hover .follower {
     background-color: #1c1c1c;
     border-radius: 20px;
     color: #fff;
-    width: 320px;
+    width: 30vw;
     margin: 2rem auto;
     text-align: center;
     padding: 1.5rem 1rem;
@@ -173,4 +132,62 @@ a:hover .follower {
 
 .profile-button:hover {
     background-color: #444;
+}
+.profile-stats a {
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+    text-align: center;
+}
+
+.profile-stats a:hover {
+    opacity: 0.8;
+}
+
+.user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 0;
+}
+
+.user-card {
+    background-color: #2a2a2a;
+    border-radius: 16px;
+    text-align: center;
+    padding: 1rem 0.5rem;
+    text-decoration: none;
+    color: #fff;
+    transition: background-color 0.2s ease;
+}
+
+.user-card:hover {
+    background-color: #3a3a3a;
+}
+
+.user-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+    border: 2px solid #444;
+}
+
+.user-pseudo {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #ddd;
+}
+
+.back-button {
+    display: inline-block;
+    margin-top: 1rem;
+    text-decoration: none;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+.back-button:hover {
+    text-decoration: underline;
 }

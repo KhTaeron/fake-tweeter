@@ -23,6 +23,16 @@ class UserApiClientService extends ApiClientBaseService
         return $this->fetchJson("/users/me");
     }
 
+    public function getFollowers(int $id): ?array
+    {
+        return $this->fetchJson("/users/$id/followers/");
+    }
+
+    public function getSubscriptions(int $id): ?array
+    {
+        return $this->fetchJson("/users/$id/subscriptions/");
+    }
+
     public function updateMe(array $data): bool
     {
         return $this->putJson('/users/me', $data);

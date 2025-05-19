@@ -81,20 +81,8 @@ class UserService
                 'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
             ], $user->getTweets()->toArray()),
 
-            'followers' => array_map(fn($subscription) => [
-                'followingUser' => [
-                    'id' => $subscription->getFollowingUser()->getId(),
-                    'pseudo' => $subscription->getFollowingUser()->getPseudo(),
-                ]
-            ], $user->getFollowers()->toArray()),
-
-            'subscriptions' => array_map(fn($subscription) => [
-                'followedUser' => [
-                    'id' => $subscription->getFollowedUser()->getId(),
-                    'pseudo' => $subscription->getFollowedUser()->getPseudo(),
-                ]
-            ], $user->getSubscriptions()->toArray()),
-
+            'followerCount' => $user->getFollowers()->count(),
+            'subscriptionCount' => $user->getSubscriptions()->count(),
         ];
 
         if ($user->getAvatar()) {
@@ -182,6 +170,40 @@ class UserService
         $this->entityManagerInterface->flush();
 
         return count($user->getSubscriptions());
+    }
+
+    public function getFollowers(User $user): array
+    {
+        return array_map(function (Subscription $subscription) {
+            $u = $subscription->getFollowingUser();
+            return [
+                'id' => $u->getId(),
+                'pseudo' => $u->getPseudo(),
+                'avatar' => $u->getAvatar()
+                    ? [
+                        'path' => $u->getAvatar()->getPath(),
+                        'url' => '/uploads/avatars/' . $u->getAvatar()->getPath(),
+                    ]
+                    : null,
+            ];
+        }, $user->getFollowers()->toArray());
+    }
+
+    public function getFollowing(User $user): array
+    {
+        return array_map(function (Subscription $subscription) {
+            $u = $subscription->getFollowedUser();
+            return [
+                'id' => $u->getId(),
+                'pseudo' => $u->getPseudo(),
+                'avatar' => $u->getAvatar()
+                    ? [
+                        'path' => $u->getAvatar()->getPath(),
+                        'url' => '/uploads/avatars/' . $u->getAvatar()->getPath(),
+                    ]
+                    : null,
+            ];
+        }, $user->getSubscriptions()->toArray());
     }
 
 }

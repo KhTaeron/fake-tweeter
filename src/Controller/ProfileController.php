@@ -29,6 +29,44 @@ class ProfileController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/followers', name: 'profile_followers', requirements: ['id' => '\d+'])]
+    public function followers(int $id, SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+
+        $user = $api->getUser($id);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur introuvable.');
+        }
+
+        $followers = $api->getFollowers($id);
+
+        return $this->render('profile/followers.html.twig', [
+            'user' => $user,
+            'followers' => $followers,
+        ]);
+    }
+
+    #[Route('/{id}/following', name: 'profile_following', requirements: ['id' => '\d+'])]
+    public function following(int $id, SessionInterface $session, UserApiClientService $api): Response
+    {
+        $api->setTokenFromSession($session);
+
+        $user = $api->getUser($id);id: 
+
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur introuvable.');
+        }
+
+        $subscriptions = $api->getSubscriptions($id);
+
+        return $this->render('profile/following.html.twig', [
+            'user' => $user,
+            'subscriptions' => $subscriptions,
+        ]);
+    }
+
     #[Route('/edit', name: 'profile_edit')]
     public function edit(SessionInterface $session, UserApiClientService $api): Response
     {

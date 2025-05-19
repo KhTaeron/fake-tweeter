@@ -37,6 +37,27 @@ class UserController extends AbstractController
         return $this->json($data);
     }
 
+    #[Route('/{id}/followers', name: 'api_user_followers', methods: ['GET'])]
+    public function followers(int $id, UserService $service): JsonResponse
+    {
+        $user = $service->getUserEntityById($id);
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur introuvable'], 404);
+        }
+
+        return $this->json($service->getFollowers($user));
+    }
+
+    #[Route('/{id}/subscriptions', name: 'api_user_subscriptions', methods: ['GET'])]
+    public function subscriptions(int $id, UserService $service): JsonResponse
+    {
+        $user = $service->getUserEntityById($id);
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur introuvable'], 404);
+        }
+
+        return $this->json($service->getFollowing($user));
+    }
 
     #[Route('/me', name: 'api_user_update_me', methods: ['PUT'])]
     public function updateMe(Request $request, UserService $service): JsonResponse
