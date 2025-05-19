@@ -134,16 +134,20 @@ class TweetService
     public function search(string $keyword = ''): array
     {
         if ($keyword === '') {
-            return $this->tweetRepository->fetchAllOrdered();
-        }
+            $result = $this->tweetRepository->fetchAllOrdered();
+        } else {
+            $result = $this->tweetRepository->searchByKeyword($keyword);
+        }   
 
-        return $this->tweetRepository->searchByKeyword($keyword);
+        return array_map(function (Tweet $tweet) {
+            return $this->formatTweet($tweet);
+        }, $result);
     }
     public function getFullEntity(int $id): ?Tweet
     {
         return $this->tweetRepository->find($id);
     }
-    
+
     public function formatTweet(Tweet $tweet): array
     {
         $retweetOrigin = $tweet->getRetweetOrigin();
@@ -160,6 +164,11 @@ class TweetService
             'tweeter' => [
                 'id' => $tweet->getTweeter()->getId(),
                 'pseudo' => $tweet->getTweeter()->getPseudo(),
+                'avatar' => $tweet->getTweeter()->getAvatar()
+                    ? [
+                        'path' => $tweet->getTweeter()->getAvatar()->getPath(),
+                    ]
+                    : null,
             ],
             'likeCount' => count($tweet->getLikes()),
         ];

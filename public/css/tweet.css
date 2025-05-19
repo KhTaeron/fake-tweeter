@@ -203,3 +203,34 @@
 .tweet-likes-list {
     margin-top: 2rem;
 }
+.tweet-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+}
+
+.tweet-author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+
+.tweet-author-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #ac9797;
+}
+
+.tweet-author-link:hover .tweet-author-pseudo {
+    text-decoration: underline;
+}
+
+.tweet-author-pseudo {
+    font-weight: bold;
+    font-size: 1rem;
+}

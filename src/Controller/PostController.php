@@ -36,6 +36,7 @@ class PostController extends AbstractController
             'likes' => $likes,
         ]);
     }
+    
     #[Route('/{id}/like', name: 'like_post', methods: ['POST'])]
     public function like(int $id, SessionInterface $session, TweetApiClientService $api): Response
     {

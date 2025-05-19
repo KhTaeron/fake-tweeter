@@ -42,18 +42,7 @@ class TweetController extends AbstractController
 
             $results = $tweets->search($keyword);
 
-            return $this->json(array_map(function (\App\Entity\Tweet $tweet) {
-                $tweeter = $tweet->getTweeter();
-                return [
-                    'id' => $tweet->getId(),
-                    'content' => $tweet->getContent(),
-                    'publicationDate' => $tweet->getPublicationDate()->format('Y-m-d H:i'),
-                    'tweeter' => $tweeter ? [
-                        'id' => $tweeter->getId(),
-                        'pseudo' => $tweeter->getPseudo(),
-                    ] : null,
-                ];
-            }, $results));
+            return $this->json($results);
         } catch (\Throwable $e) {
             return $this->json([
                 'error' => 'Erreur interne',

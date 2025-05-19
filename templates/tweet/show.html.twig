@@ -18,8 +18,13 @@
     </div>
 
     <div class="tweet-card">
-        <div class="tweet-header">
-            <strong>@{{ tweet.tweeter.pseudo }}</strong>
+        <div class="tweet-author">
+            <a href="{{ path('profile_show', { id: tweet.tweeter.id }) }}" class="tweet-author-link">
+                <img class="tweet-author-avatar"
+                    src="{{ tweet.tweeter.avatar ? asset('uploads/avatars/' ~ tweet.tweeter.avatar.path) : asset('images/default-avatar.webp') }}"
+                    alt="Avatar de {{ tweet.tweeter.pseudo }}">
+                <strong class="tweet-author-pseudo">@{{ tweet.tweeter.pseudo }}</strong>
+            </a>
             <span class="tweet-date">{{ tweet.publicationDate|date('d/m/Y H:i') }}</span>
         </div>
         <p class="tweet-content">{{ tweet.content }}</p>
