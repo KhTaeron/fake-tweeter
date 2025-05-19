@@ -9,24 +9,49 @@
     {% block stylesheets %}{% endblock %}
 </head>
 <body class="app-layout">
-
-    <header class="app-navbar">
-        <div class="nav-left">
-            <a href="{{ path('tweets_home') }}" class="logo">🌀</a>
-        </div>
-        <div class="nav-center">
-            <a href="{{ path('get_notifications') }}" class="logo">
-                <i class="fa-regular fa-bell notification-icon"></i>
-            </a>
-        </div>
-        <div class="nav-right">
-            <form method="post" action="{{ path('logout') }}">
-                <button type="submit" class="logout-button">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-                </button>
-            </form>
-        </div>
-    </header>
+    {% if user is defined and user %}
+        <header class="app-navbar">
+            <div class="nav-left">
+                <a href="{{ path('tweets_home') }}" class="logo">🌀</a>
+            </div>
+            <div class="nav-center">
+                <a href="{{ path('get_notifications') }}" class="logo">
+                    <i class="fa-regular fa-bell notification-icon"></i>
+                </a>
+            </div>
+            <div class="nav-right">
+                <form method="post" action="{{ path('logout') }}">
+                    <button type="submit" class="logout-button">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </header>
+    {% elseif profileMe is defined and profileMe %}
+        <header class="app-navbar">
+            <div class="nav-left">
+                <a href="{{ path('tweets_home') }}" class="logo">🌀</a>
+            </div>
+            <div class="nav-center">
+                <a href="{{ path('get_notifications') }}" class="logo">
+                    <i class="fa-regular fa-bell notification-icon"></i>
+                </a>
+            </div>
+            <div class="nav-right">
+                <form method="post" action="{{ path('logout') }}">
+                    <button type="submit" class="logout-button">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </header>
+    {% else %}
+        <header class="app-navbar">
+            <div class="nav-left">
+                <a href="{{ path('login_form') }}" class="logo">🌀</a>
+            </div>
+        </header>
+    {% endif %}
 
     <main class="app-columns">
         <aside class="sidebar-left">
