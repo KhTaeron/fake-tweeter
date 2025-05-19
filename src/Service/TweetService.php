@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Psr\Log\LoggerInterface;
 
 class TweetService
 {
@@ -119,7 +120,7 @@ class TweetService
 
         if ($tweet->getTweeter()->getId() !== $user->getId()) {
             throw new AccessDeniedException('Vous n’êtes pas autorisé à modifier ce tweet.');
-        
+
         }
 
         $violations = $this->validator->validate(
@@ -193,42 +194,45 @@ class TweetService
         return count($tweet->getLikes());
     }
 
-    public function retweet(array $payload, User $author): array
-{
-    $violations = $this->validator->validate(
-        $payload,
-        new Assert\Collection([
-            'allowExtraFields' => true,
-            'fields' => [
-                'original_tweet_id' => [new Assert\NotBlank()],
-            ],
-        ])
-    );
+    public function retweet(int $originTweet, User $author, string $commentaire, LoggerInterface $logger): array
+    {
+        $logger->info('📩 Début de retweet', [
+            'originTweetId' => $originTweet,
+            'comm' => $commentaire,
+            'authorId' => $author->getId()
+        ]);
 
-    if (count($violations) > 0) {
-        throw new \InvalidArgumentException((string) $violations);
+        $origin = $this->tweetRepository->find($originTweet);
+        if (!$origin) {
+            $logger->error('❌ Tweet original introuvable', [
+                'tweetInput' => $originTweet,
+            ]);
+            throw new \RuntimeException('Tweet original introuvable');
+        }
+
+        $tweet = (new Tweet())
+            ->setPublicationDate(new \DateTime())
+            ->setTweeter($author)
+            ->setRetweetOrigin($origin)
+            ->setCommentaire($commentaire)
+            ->setContent($origin->getContent());
+
+        $this->em->persist($tweet);
+        $this->em->flush();
+
+        $logger->info('✅ Retweet enregistré avec succès', [
+            'newTweetId' => $tweet->getId(),
+            'originalId' => $origin->getId(),
+            'byUser' => $author->getPseudo(),
+        ]);
+
+        return [
+            'id' => $tweet->getId(),
+            'content' => $tweet->getContent(),
+            'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
+            'tweeterId' => $author->getId(),
+        ];
     }
 
-    $origin = $this->tweetRepository->find($payload['original_tweet_id']);
-    if (!$origin) {
-        throw new \RuntimeException('Tweet original introuvable');
-    }
-
-    $tweet = (new Tweet())
-        ->setPublicationDate(new \DateTime())
-        ->setTweeter($author)
-        ->setRetweetOrigin($origin)
-        ->setContent(null); // ✅ aucun contenu
-
-    $this->em->persist($tweet);
-    $this->em->flush();
-
-    return [
-        'id' => $tweet->getId(),
-        'content' => $tweet->getContent(),
-        'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
-        'tweeterId' => $author->getId(),
-    ];
-}
 
 }

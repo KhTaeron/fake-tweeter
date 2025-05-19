@@ -19,6 +19,9 @@ class Tweet
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $commentaire = null;
+
     #[ORM\Column]
     private ?\DateTime $publicationDate = null;
 
@@ -51,9 +54,21 @@ class Tweet
         return $this->content;
     }
 
-    public function setContent(string $content): static
+    public function setContent(?string $content): static
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getCommentaire(): ?string
+    {
+        return $this->commentaire;
+    }
+
+    public function setCommentaire(?string $commentaire): static
+    {
+        $this->commentaire = $commentaire;
 
         return $this;
     }
@@ -112,7 +127,7 @@ class Tweet
         return $this;
     }
 
-        public function getRetweetOrigin(): ?Tweet
+    public function getRetweetOrigin(): ?Tweet
     {
         return $this->retweetOrigin;
     }
