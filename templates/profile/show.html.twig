@@ -9,30 +9,27 @@
 
 
 {% block body %}
-<div class="profile-container">
-    <div class="profile-header">
-        <a href="{{ path('tweets_home') }}" class="home-link">← Retour aux tweets</a>
-        <h1>@{{ user.pseudo }}</h1>
+<div class="profile-card">
+    <div class="profile-header-bg">
+        <img class="profile-avatar" src="{{ user.avatar ? asset('uploads/avatars/' ~ user.avatar.path) : asset('images/default-avatar.webp') }}" alt="Avatar">
     </div>
 
+    <div class="profile-stats">
+        <div>
+            <strong>{{ user.followers|length }}</strong><br>
+            <span>Followers</span>
+        </div>
+        <div>
+            <strong>{{ user.subscriptions|length }}</strong><br>
+            <span>Following</span>
+        </div>
+    </div>
 
-    {% if user.avatar %}
-        <img src="{{ asset('uploads/avatars/' ~ user.avatar.path) }}" alt="Avatar" />
-
-        <script>
-            console.log("Avatar path:", "{{ asset('uploads/avatars/' ~ user.avatar.path) }}");
-        </script>
-    {% else %}
-        <script>
-            console.log("Aucun avatar pour cet utilisateur.");
-        </script>
-    {% endif %}
-
-
-    <ul class="profile-info">
-        <li><strong>Pseudo :</strong> {{ user.pseudo }}</li>
-        <li><strong>Date d'inscription :</strong> {{ user.registrationDate|date('d/m/Y') }}</li>
-    </ul>
+    <div class="profile-identity">
+        <h2>{{ user.fullName ? user.fullName : user.pseudo }}</h2>
+        <p class="username">@{{ user.pseudo|lower }}</p>
+        <p class="bio">🌟 Hello, I'm UX/UI designer. Open to the new projects. 🌟</p>
+    </div>
 
     <div>
         <div class="section-title">Tweets</div>
@@ -46,7 +43,7 @@
         {% endfor %}
     </div>
 
-    <div>
+    {# <div>
         <div class="section-title">Abonnements</div>
         {% for subscription in user.subscriptions %}
             <a href="{{ path('profile_show', {'id': subscription.followedUser.id}) }}">
@@ -70,7 +67,7 @@
         {% else %}
             <p class="empty">Aucun abonné</p>
         {% endfor %}
-    </div>
+    </div> #}
 
     <form method="post" action="{{ path('profile_follow', {'id': user.id}) }}">
         <button type="submit">

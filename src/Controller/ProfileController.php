@@ -71,6 +71,8 @@ class ProfileController extends AbstractController
 
         $data = [
             'pseudo' => $request->request->get('pseudo'),
+            'fullName' => $request->request->get('fullName'),
+            'description' => $request->request->get('description'),
         ];
 
         $success = $api->updateMe($data);

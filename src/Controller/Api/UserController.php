@@ -49,13 +49,15 @@ class UserController extends AbstractController
 
         $payload = json_decode($request->getContent(), true);
         $pseudo = $payload['pseudo'] ?? null;
+        $fullName = $payload['fullName'] ?? null;
+        $description = $payload['description'] ?? null;
 
         if (!$pseudo || trim($pseudo) === '') {
             return $this->json(['error' => 'Pseudo invalide'], 422);
         }
 
         try {
-            $service->updateUser($user, $pseudo);
+            $service->updateUser($user, $pseudo, $fullName, $description);
             return $this->json(['success' => true]);
         } catch (\Throwable $e) {
             return $this->json([

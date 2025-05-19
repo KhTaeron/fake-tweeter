@@ -5,7 +5,7 @@ body {
     margin: 0;
 }
 
-.profile-container {
+/* .profile-container {
     max-width: 600px;
     margin: 40px auto;
     background: #fff;
@@ -46,7 +46,7 @@ body {
 .profile-info li {
     list-style: none;
     margin-bottom: 8px;
-}
+} */
 
 .section-title {
     font-weight: 600;
@@ -90,4 +90,87 @@ a:hover .following,
 a:hover .follower {
     background-color: #e2e2e2;
     cursor: pointer;
+}
+
+.profile-card {
+    background-color: #1c1c1c;
+    border-radius: 20px;
+    color: #fff;
+    width: 320px;
+    margin: 2rem auto;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+    font-family: 'Segoe UI', sans-serif;
+    position: relative;
+}
+
+.profile-header-bg {
+    background: radial-gradient(circle, #ffcc00 0%, #1c1c1c 65%);
+    height: 100px;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid #1c1c1c;
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    object-fit: cover;
+    background-color: #000;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 50px;
+    margin-bottom: 1rem;
+}
+
+.profile-stats strong {
+    font-size: 1.2rem;
+}
+
+.profile-stats span {
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+.profile-identity h2 {
+    margin: 0.5rem 0 0;
+    font-size: 1.4rem;
+}
+
+.profile-identity .username {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 0.5rem;
+}
+
+.profile-identity .bio {
+    font-size: 0.9rem;
+    margin: 0.5rem auto;
+    max-width: 80%;
+    color: #ddd;
+}
+
+.profile-button {
+    background-color: #2e2e2e;
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 12px;
+    margin-top: 1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.3s ease;
+}
+
+.profile-button:hover {
+    background-color: #444;
 }

@@ -36,9 +36,20 @@ class UserService
         return $this->formatUser($user, true);
     }
 
-    public function updateUser(User $user, string $pseudo): void
+    public function updateUser(User $user, ?string $pseudo, ?string $fullName, ?string $description): void
     {
-        $user->setPseudo($pseudo);
+        if ($pseudo !== null && trim($pseudo) !== '') {
+            $user->setPseudo($pseudo);
+        }
+
+        if ($fullName !== null && trim($fullName) !== '') {
+            $user->setFullName($fullName);
+        }
+
+        if ($description !== null && trim($description) !== '') {
+            $user->setDescription($description);
+        }
+
         $this->entityManagerInterface->persist($user);
         $this->entityManagerInterface->flush();
     }
@@ -61,6 +72,8 @@ class UserService
         $data = [
             'id' => $user->getId(),
             'pseudo' => $user->getPseudo(),
+            'fullName' => $user->getFullName(),
+            'description' => $user->getDescription(),
             'registrationDate' => $user->getRegistrationDate()->format('Y-m-d'),
             'tweets' => array_map(fn($tweet) => [
                 'id' => $tweet->getId(),
@@ -91,7 +104,6 @@ class UserService
                 'url' => '/uploads/avatars/' . $avatar->getPath(),
             ];
         } else {
-            dump("NOTHIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIINGGG");
             $data['avatar'] = null;
         }
 

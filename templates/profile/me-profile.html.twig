@@ -7,31 +7,35 @@
     <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
 {% endblock %}
 
-
 {% block body %}
-<div class="profile-container">
-    <div class="profile-header">
-        <a href="{{ path('tweets_home') }}" class="home-link">← Retour aux tweets</a>
-        <h1>Bienvenue sur votre profil, {{ user.pseudo }}</h1>
-        <a href="{{ path('profile_edit') }}" class="edit-link" title="Modifier le profil">✏️</a>
+<div class="profile-card">
+    <div class="profile-header-bg">
+        <img class="profile-avatar"
+             src="{{ user.avatar ? asset('uploads/avatars/' ~ user.avatar.path) : asset('images/default-avatar.webp') }}"
+             alt="Avatar">
     </div>
 
-    {% if user.avatar %}
-        <img src="{{ asset('uploads/avatars/' ~ user.avatar.path) }}" alt="Avatar" />
+    <div class="profile-stats">
+        <div>
+            <strong>{{ user.followers|length }}</strong><br>
+            <span>Followers</span>
+        </div>
+        <div>
+            <strong>{{ user.subscriptions|length }}</strong><br>
+            <span>Following</span>
+        </div>
+    </div>
 
-        <script>
-            console.log("Avatar path:", "{{ asset('uploads/avatars/' ~ user.avatar.path) }}");
-        </script>
-    {% else %}
-        <script>
-            console.log("Aucun avatar pour cet utilisateur.");
-        </script>
-    {% endif %}
-    
-    <ul class="profile-info">
-        <li><strong>Pseudo :</strong> {{ user.pseudo }}</li>
-        <li><strong>Date d'inscription :</strong> {{ user.registrationDate|date('d/m/Y') }}</li>
-    </ul>
+    <div class="profile-identity">
+        <h2>{{ user.fullName ? user.fullName : user.pseudo }}</h2>
+        <p class="username">@{{ user.pseudo|lower }}</p>
+
+        {% if user.description %}
+            <p class="bio">{{ user.description }}</p>
+        {% else %}
+            <p class="bio empty">Ce profil n’a pas encore de description.</p>
+        {% endif %}
+    </div>
 
     <div>
         <div class="section-title">Tweets</div>
@@ -45,32 +49,6 @@
         {% endfor %}
     </div>
 
-    <div>
-        <div class="section-title">Abonnements</div>
-        {% for subscription in user.subscriptions %}
-            <a href="{{ path('profile_show', {'id': subscription.followedUser.id}) }}">
-                <div class="following">
-                        {{ subscription.followedUser.pseudo }}
-                </div>
-            </a>
-        {% else %}
-            <p class="empty">Aucun abonnement</p>
-        {% endfor %}
-    </div>
-
-    <div>
-        <div class="section-title">Abonnés</div>
-        {% for subscription in user.followers %}
-            <a href="{{ path('profile_show', {'id': subscription.followingUser.id}) }}">
-                <div class="follower">
-                        {{ subscription.followingUser.pseudo }}
-                </div>
-            </a>
-        {% else %}
-            <p class="empty">Aucun abonné</p>
-        {% endfor %}
-    </div>
-    
     <form method="delete" action="{{ path('profile_delete') }}">
         <input type="hidden" name="_method" value="DELETE">
         <button type="submit" onclick="return confirm('Supprimer votre compte ?')">
@@ -78,5 +56,6 @@
         </button>
     </form>
 
+    <a href="{{ path('profile_edit') }}" class="edit-link" title="Modifier le profil">✏️ Modifier mon profil</a>
 </div>
 {% endblock %}

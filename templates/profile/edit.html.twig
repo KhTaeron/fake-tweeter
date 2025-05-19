@@ -10,6 +10,12 @@
         <p>Attention, vous serez déconnecté après avoir modifié votre pseudo - Veuillez vous reconnecter avec le nouveau pseudo.</p>
         <input type="text" name="pseudo" id="pseudo" value="{{ user.pseudo }}" required>
 
+        <label for="fullName">Nom complet</label>
+        <input type="text" name="fullName" id="fullName" value="{{ user.fullName }}">
+
+        <label for="description">Description</label>
+        <textarea name="description" id="description" rows="4">{{ user.description }}</textarea>
+        
         <button type="submit">Enregistrer</button>
     </form>
 

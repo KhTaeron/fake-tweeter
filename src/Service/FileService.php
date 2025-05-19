@@ -33,7 +33,6 @@ class FileService
         $entity->setMimeType($mimeType);
         $entity->setSize($size);
         $entity->setUploadedAt(new \DateTimeImmutable());
-        $entity->setUser($user);
 
         $this->em->persist($entity);
         $this->em->flush();
