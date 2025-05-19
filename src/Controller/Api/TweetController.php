@@ -5,252 +5,145 @@ namespace App\Controller\Api;
 use App\Repository\UserRepository;
 use App\Service\TweetService;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
 use Psr\Log\LoggerInterface;
 
-
+#[OA\Tag(name: 'Tweets')]
 #[Route('/api/tweets')]
 class TweetController extends AbstractController
 {
+    #[OA\Get(summary: 'Liste tous les tweets')]
+    #[OA\Response(response: 200, description: 'Liste des tweets')]
     #[Route('', methods: ['GET'], name: 'tweets_list')]
-    #[OA\Get(
-        path: '/tweets',
-        summary: 'Liste tous les tweets',
-        tags: ['Tweets'],
-        responses: [
-            new OA\Response(response: 200, description: 'Liste des tweets')
-        ]
-    )]
     public function list(TweetService $tweets): JsonResponse
     {
         return $this->json($tweets->list());
     }
 
-
+    #[OA\Get(summary: 'Rechercher des tweets')]
+    #[OA\Parameter(name: 'q', in: 'query', required: false, schema: new OA\Schema(type: 'string'))]
+    #[OA\Response(response: 200, description: 'Tweets trouvés')]
     #[Route('/search', name: 'api_tweets_search', methods: ['GET'])]
     public function search(Request $request, TweetService $tweets): JsonResponse
     {
-        try {
-            $keyword = $request->query->get('q', '');
-
-            $results = $tweets->search($keyword);
-
-            return $this->json(array_map(function (\App\Entity\Tweet $tweet) {
-                $tweeter = $tweet->getTweeter();
-                return [
-                    'id' => $tweet->getId(),
-                    'content' => $tweet->getContent(),
-                    'publicationDate' => $tweet->getPublicationDate()->format('Y-m-d H:i'),
-                    'tweeter' => $tweeter ? [
-                        'id' => $tweeter->getId(),
-                        'pseudo' => $tweeter->getPseudo(),
-                    ] : null,
-                ];
-            }, $results));
-        } catch (\Throwable $e) {
-            return $this->json([
-                'error' => 'Erreur interne',
-                'type' => get_class($e),
-                'message' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ], 500);
-        }
+        $keyword = $request->query->get('q', '');
+        return $this->json($tweets->search($keyword));
     }
 
+    #[OA\Get(summary: 'Afficher un tweet par ID')]
+    #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Response(response: 200, description: 'Tweet trouvé')]
+    #[OA\Response(response: 404, description: 'Tweet introuvable')]
     #[Route('/{id}', methods: ['GET'])]
-    #[OA\Get(
-        path: '/tweets/{id}',
-        summary: 'Afficher un tweet par ID',
-        tags: ['Tweets'],
-        parameters: [
-            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'Tweet trouvé'),
-            new OA\Response(response: 404, description: 'Tweet introuvable')
-        ]
-    )]
     public function show(int $id, TweetService $tweetService): JsonResponse
     {
-        $user = $this->getUser();
-
         $tweet = $tweetService->getFullEntity($id);
-
-        $tweeter = $tweet->getTweeter();
-
         if (!$tweet) {
             return $this->json(['error' => 'Tweet introuvable'], 404);
         }
-
         $formattedTweet = $tweetService->formatTweet($tweet);
-
-        if ($tweeter == $user) {
-            $formattedTweet['isCurrentUser'] = true;
-        } else {
-            $formattedTweet['isCurrentUser'] = false;
-        }
-
+        $formattedTweet['isCurrentUser'] = $tweet->getTweeter() === $this->getUser();
         return $this->json($formattedTweet);
     }
 
+    #[OA\Post(summary: 'Liker ou unliker un tweet')]
+    #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Response(response: 201, description: 'Like modifié')]
+    #[OA\Response(response: 401, description: 'Non authentifié')]
     #[Route('/{id}/likes', name: 'tweet_like_add', methods: ['POST'])]
     public function like(int $id, TweetService $tweetService): JsonResponse
     {
         $user = $this->getUser();
-
-        if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
-
-        try {
-            $tweetService->toggleLike($id, $user);
-            return $this->json(['success' => true], 201);
-        } catch (\Throwable $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
-        }
+        if (!$user) return $this->json(['error' => 'Non authentifié'], 401);
+        $tweetService->toggleLike($id, $user);
+        return $this->json(['success' => true], 201);
     }
 
+    #[OA\Post(summary: 'Créer un tweet')]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(
+        required: ['content'],
+        properties: [
+            new OA\Property(property: 'content', type: 'string', example: 'Mon nouveau tweet')
+        ]
+    ))]
+    #[OA\Response(response: 201, description: 'Tweet créé')]
+    #[OA\Response(response: 401, description: 'Non authentifié')]
     #[Route('/create', methods: ['POST'], name: 'tweet_create')]
     public function create(Request $request, TweetService $tweetService, UserRepository $users): JsonResponse
     {
         $user = $this->getUser();
-
-        if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
-
+        if (!$user) return $this->json(['error' => 'Non authentifié'], 401);
         $payload = $request->toArray();
-
-        try {
-            $tweetService->create($payload, $user);
-            return $this->json(['success' => true], 201);
-        } catch (\Throwable $e) {
-            return $this->json(['error' => $e->getMessage()], 400);
-        }
-
+        $tweetService->create($payload, $user);
+        return $this->json(['success' => true], 201);
     }
+
+    #[OA\Delete(summary: 'Supprimer un tweet')]
+    #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Response(response: 204, description: 'Tweet supprimé')]
+    #[OA\Response(response: 401, description: 'Non authentifié')]
+    #[OA\Response(response: 403, description: 'Accès refusé')]
     #[Route('/{id}/delete', methods: ['DELETE'], name: 'tweet_delete')]
     public function deleteTweet(int $id, TweetService $tweetService): JsonResponse
     {
         $user = $this->getUser();
-
-        if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
-
-        try {
-            $tweetService->delete($id, $user);
-        } catch (AccessDeniedException $e) {
-            return $this->json(['error' => $e->getMessage()], 403);
-        } catch (\RuntimeException $e) {
-            return $this->json(['error' => $e->getMessage()], 404);
-        }
-
+        if (!$user) return $this->json(['error' => 'Non authentifié'], 401);
+        $tweetService->delete($id, $user);
         return new JsonResponse(null, 204);
     }
 
+    #[OA\Get(summary: 'Lister les likes dun tweet')]
+    #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Response(response: 200, description: 'Liste des likes')]
     #[Route('/{id}/likes', methods: ['GET'], name: 'tweet_likes')]
     public function likes(int $id, TweetService $tweets): JsonResponse
     {
-        try {
-            $likes = $tweets->getLikes($id);
-        } catch (\RuntimeException $e) {
-            return $this->json(['error' => $e->getMessage()], 404);
-        }
-
+        $likes = $tweets->getLikes($id);
         return $this->json($likes);
     }
+
+    #[OA\Put(summary: 'Mettre à jour un tweet')]
+    #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(
+        required: ['content'],
+        properties: [
+            new OA\Property(property: 'content', type: 'string', example: 'Tweet modifié')
+        ]
+    ))]
+    #[OA\Response(response: 200, description: 'Tweet mis à jour')]
+    #[OA\Response(response: 401, description: 'Non authentifié')]
+    #[OA\Response(response: 422, description: 'Erreur de validation')]
     #[Route('/{id}/update', methods: ['PUT'], name: 'tweet_update')]
     public function update(int $id, Request $request, TweetService $tweets): JsonResponse
     {
-
         $user = $this->getUser();
-        if (!$user) {
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
-
+        if (!$user) return $this->json(['error' => 'Non authentifié'], 401);
         $payload = $request->toArray();
-
-        try {
-            $updated = $tweets->updateTweet($id, $payload, $user); // ⬅️ on passe $user
-
-        } catch (\RuntimeException $e) {
-            return $this->json(['error' => $e->getMessage()], 403);
-        } catch (\RuntimeException $e) {
-            return $this->json(['error' => $e->getMessage()], 404);
-        } catch (\InvalidArgumentException $e) {
-            return $this->json(['error' => $e->getMessage()], 422);
-        }
-
+        $updated = $tweets->updateTweet($id, $payload, $user);
         return $this->json($updated);
     }
 
-
+    #[OA\Post(summary: 'Retweeter un tweet avec un commentaire (facultatif)')]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(
+        required: ['original_tweet_id'],
+        properties: [
+            new OA\Property(property: 'original_tweet_id', type: 'integer', example: 42),
+            new OA\Property(property: 'content', type: 'string', nullable: true, example: 'Mon avis sur ce tweet')
+        ]
+    ))]
+    #[OA\Response(response: 201, description: 'Retweet réussi')]
+    #[OA\Response(response: 401, description: 'Non authentifié')]
     #[Route('/retweet', methods: ['POST'], name: 'tweet_retweet')]
-    public function retweetTweet(
-        Request $request,
-        TweetService $tweetService,
-        LoggerInterface $logger
-    ): JsonResponse {
-        $logger->info('📩 Requête reçue pour retweet');
-
+    public function retweetTweet(Request $request, TweetService $tweetService, LoggerInterface $logger): JsonResponse
+    {
         $user = $this->getUser();
-
-        if (!$user) {
-            $logger->warning('❌ Tentative de retweet sans utilisateur authentifié.');
-            return $this->json(['error' => 'Non authentifié'], 401);
-        }
-
-        $logger->info('👤 Utilisateur connecté : ' . $user->getUserIdentifier());
-
-        $payload = $request->toArray();        
-        $logger->debug('📦 Payload reçu : ' . json_encode($payload));
-        $originalTweetId = $payload['original_tweet_id'];
-        $commentaire = $payload['content'];
-
-        if (!isset($originalTweetId)) {
-            $logger->error('🚫 original_tweet_id manquant dans la requête');
-            return $this->json(['error' => 'Tweet original manquant'], 400);
-        }
-        $logger->debug('📦 Id reçu : ' .$originalTweetId);
-
-        try {
-            $retweet = $tweetService->retweet($originalTweetId, $user, $commentaire, $logger);
-            $logger->info('✅ Retweet créé avec succès. ID = ' . $retweet['id']);
-
-            return $this->json([
-                'success' => true,
-                'retweet_id' => $retweet['id'],
-            ], 201);
-
-        } catch (\InvalidArgumentException $e) {
-            $logger->error('❗ Validation erreur : ' . $e->getMessage());
-            return $this->json(['error' => $e->getMessage()], 422);
-        } catch (\RuntimeException $e) {
-            $logger->error('⛔ Erreur logique : ' . $e->getMessage());
-            return $this->json(['error' => $e->getMessage()], 404);
-        } catch (\Throwable $e) {
-            $logger->critical('💥 Exception inattendue : ' . $e->getMessage(), [
-                'type' => get_class($e),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-
-            return $this->json([
-                'error' => 'Erreur interne',
-                'type' => get_class($e),
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ], 500);
-        }
+        if (!$user) return $this->json(['error' => 'Non authentifié'], 401);
+        $payload = $request->toArray();
+        $retweet = $tweetService->retweet($payload['original_tweet_id'], $user, $payload['content'] ?? '', $logger);
+        return $this->json(['success' => true, 'retweet_id' => $retweet['id']], 201);
     }
 }
