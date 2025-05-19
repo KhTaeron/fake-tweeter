@@ -1,44 +1,49 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/notification.css') }}">
+{% endblock %}
+
 {% block title %}Notifications{% endblock %}
 
 {% block sidebar_left %}
     {{ include('profile/_card.html.twig', { user: profileMe, showActions: true }) }}
 {% endblock %}
+
 {% block body %}
-<h1>Mes notifications</h1>
+<h1 class="section-title">🔔 Mes notifications</h1>
 
-<ul>
+<div class="notifications-container">
     {% for notif in notifications %}
-        <li>
-            {% if notif.type == 'like' %}
-                <a href="{{ path('profile_show', { id: notif.payload.likerId }) }}">
-                    {{ notif.payload.liker }}
-                </a>
-                a aimé votre <a href="{{ path('tweet_detail', { id: notif.payload.tweetId }) }}">tweet</a>.
-            {% elseif notif.type == 'follow' %}
-                <a href="{{ path('profile_show', { id: notif.payload.followerId }) }}">
-                    {{ notif.payload.follower }}
-                </a>
-                vous suit maintenant.
-            {% else %}
-                Notification : {{ notif.type }}
-            {% endif %}
+        <div class="notification-card {{ notif.isRead ? '' : 'unread' }}">
+            <div class="notification-content">
+                {% if notif.type == 'like' %}
+                    <a href="{{ path('profile_show', { id: notif.payload.likerId }) }}" class="notif-user">
+                        {{ notif.payload.liker }}
+                    </a>
+                    a aimé votre 
+                    <a href="{{ path('tweet_detail', { id: notif.payload.tweetId }) }}" class="notif-link">tweet</a>.
+                {% elseif notif.type == 'follow' %}
+                    <a href="{{ path('profile_show', { id: notif.payload.followerId }) }}" class="notif-user">
+                        {{ notif.payload.follower }}
+                    </a>
+                    vous suit maintenant.
+                {% else %}
+                    Notification : {{ notif.type }}
+                {% endif %}
 
-            {% if not notif.isRead %}
-                <span style="color: white; background: red; padding: 2px 6px; margin-left: 10px; border-radius: 4px;">
-                    Nouveau
-                </span>
-                <form method="post" action="{{ path('notification_mark_read', { id: notif.id }) }}">
-                    <button type="submit">Marquer comme lu</button>
-                </form>
-            {% endif %}
-            <br>
-            <small>le {{ notif.createdAt|date('d/m/Y H:i') }}</small>
-        </li>
+                <div class="notification-meta">
+                    <small>{{ notif.createdAt|date('d/m/Y H:i') }}</small>
+                    {% if not notif.isRead %}
+                        <form method="post" action="{{ path('notification_mark_read', { id: notif.id }) }}">
+                            <button type="submit" class="mark-read-button">✔️ Marquer comme lu</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     {% else %}
-        <li>Aucune notification.</li>
+        <p class="empty">Aucune notification pour le moment.</p>
     {% endfor %}
-</ul>
-
+</div>
 {% endblock %}

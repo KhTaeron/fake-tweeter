@@ -26,9 +26,7 @@
 
         <div class="tweet-feed">
             {% for tweet in tweets %}
-                <a href="{{ path('tweet_detail', { id: tweet.id }) }}" class="tweet-clickable">
                     <div class="tweet-card">
-                    
                         {% if tweet.retweet_origin_id %}
                             <div class="retweet_details">
                                 <a href="{{ path('tweet_detail', { id: tweet.retweet_origin_id }) }}" class="republication-link">
@@ -37,18 +35,20 @@
                                 <span class="tweet-date">{{ tweet.retweet_comment }}</span>
                             </div>
                         {% endif %}
-                        <div class="tweet-header">
-                            <strong>{{ tweet.tweeter.pseudo }}</strong>
-                            <span class="tweet-date">{{ tweet.publicationDate|date('d/m/Y H:i') }}</span>
-                        </div>
-                        <div class="tweet-content">
-                            <p>{{ tweet.content }}</p>
-                        </div>
-                        <div class="tweet-footer">
-                            <span>{{ tweet.likes_count }} ❤️</span>
-                        </div>
+
+                        <a href="{{ path('tweet_detail', { id: tweet.id }) }}" class="tweet-clickable">
+                            <div class="tweet-header">
+                                <strong>{{ tweet.tweeter.pseudo }}</strong>
+                                <span class="tweet-date">{{ tweet.publicationDate|date('d/m/Y H:i') }}</span>
+                            </div>
+                            <div class="tweet-content">
+                                <p>{{ tweet.content }}</p>
+                            </div>
+                            <div class="tweet-footer">
+                                <span>{{ tweet.likes_count }} ❤️</span>
+                            </div>
+                        </a>
                     </div>
-                </a>
             {% else %}
                 <p class="empty">Aucun tweet trouvé.</p>
             {% endfor %}
