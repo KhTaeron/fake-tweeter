@@ -30,7 +30,7 @@ class NotificationController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/read', name: 'notification_mark_read', methods: ['PUT'])]
+    #[Route('/{id}/read', name: 'notification_mark_read', methods: ['POST'])]
     public function markRead(int $id, Notification $notification, SessionInterface $session, NotificationApiClientService $api): Response
     {
         $api->setTokenFromSession($session);

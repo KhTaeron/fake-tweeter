@@ -28,6 +28,12 @@
             {% for tweet in tweets %}
                 <a href="{{ path('tweet_detail', { id: tweet.id }) }}" class="tweet-clickable">
                     <div class="tweet-card">
+                    
+                        {% if tweet.retweet_origin_id %}
+                            <a href="{{ path('tweet_detail', { id: tweet.retweet_origin_id }) }}" class="republication-link">
+                                <span class="tweet-date"><i class="fa-solid fa-arrow-up-right-from-square"></i> Republication</span>
+                            </a>
+                        {% endif %}
                         <div class="tweet-header">
                             <strong>{{ tweet.tweeter.pseudo }}</strong>
                             <span class="tweet-date">{{ tweet.publicationDate|date('d/m/Y H:i') }}</span>

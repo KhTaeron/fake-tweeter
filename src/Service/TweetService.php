@@ -29,19 +29,9 @@ class TweetService
         $rawTweets = $this->tweetRepository->fetchAllOrdered();
 
         return array_map(function (Tweet $tweet) {
-            return [
-                'id' => $tweet->getId(),
-                'content' => $tweet->getContent(),
-                'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
-                'tweeter' => [
-                    'id' => $tweet->getTweeter()?->getId(),
-                    'pseudo' => $tweet->getTweeter()?->getPseudo(),
-                ],
-            ];
+            return $this->formatTweet($tweet);
         }, $rawTweets);
     }
-
-
 
     public function get(int $id): ?array
     {
@@ -153,11 +143,16 @@ class TweetService
     {
         return $this->tweetRepository->find($id);
     }
+    
     public function formatTweet(Tweet $tweet): array
     {
+        $retweetOrigin = $tweet->getRetweetOrigin();
+        $retweetOriginId = $retweetOrigin ? $retweetOrigin->getId() : null;
+
         return [
             'id' => $tweet->getId(),
             'content' => $tweet->getContent(),
+            'retweet_origin_id' => $retweetOriginId,
             'publicationDate' => $tweet->getPublicationDate()->format('Y-m-d H:i:s'),
             'tweeter' => [
                 'id' => $tweet->getTweeter()->getId(),
@@ -166,6 +161,7 @@ class TweetService
             'likeCount' => count($tweet->getLikes()),
         ];
     }
+
     public function toggleLike(int $tweetId, User $user): int
     {
         $tweet = $this->em->getRepository(Tweet::class)->find($tweetId);
