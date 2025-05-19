@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Psr\Log\LoggerInterface;
 
 class TweetService
 {
@@ -121,7 +122,7 @@ class TweetService
 
         if ($tweet->getTweeter()->getId() !== $user->getId()) {
             throw new AccessDeniedException('Vous n’êtes pas autorisé à modifier ce tweet.');
-        
+
         }
 
         $violations = $this->validator->validate(
@@ -208,4 +209,46 @@ class TweetService
         // On retourne le nombre de likes après changement
         return count($tweet->getLikes());
     }
+
+    public function retweet(int $originTweet, User $author, string $commentaire, LoggerInterface $logger): array
+    {
+        $logger->info('📩 Début de retweet', [
+            'originTweetId' => $originTweet,
+            'comm' => $commentaire,
+            'authorId' => $author->getId()
+        ]);
+
+        $origin = $this->tweetRepository->find($originTweet);
+        if (!$origin) {
+            $logger->error('❌ Tweet original introuvable', [
+                'tweetInput' => $originTweet,
+            ]);
+            throw new \RuntimeException('Tweet original introuvable');
+        }
+
+        $tweet = (new Tweet())
+            ->setPublicationDate(new \DateTime())
+            ->setTweeter($author)
+            ->setRetweetOrigin($origin)
+            ->setCommentaire($commentaire)
+            ->setContent($origin->getContent());
+
+        $this->em->persist($tweet);
+        $this->em->flush();
+
+        $logger->info('✅ Retweet enregistré avec succès', [
+            'newTweetId' => $tweet->getId(),
+            'originalId' => $origin->getId(),
+            'byUser' => $author->getPseudo(),
+        ]);
+
+        return [
+            'id' => $tweet->getId(),
+            'content' => $tweet->getContent(),
+            'publicationDate' => $tweet->getPublicationDate()->format(\DateTimeInterface::ATOM),
+            'tweeterId' => $author->getId(),
+        ];
+    }
+
+
 }

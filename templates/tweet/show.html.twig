@@ -23,9 +23,21 @@
         {% endfor %}
     </ul>
 
-    <form method="post" action="{{ path('tweet_like', { id: tweet.id }) }}">
+    <form method="post" action="{{ path('like_post', { id: tweet.id }) }}">
         <button type="submit">❤️ Liker</button>
     </form>
+
+
+    <form method="post" action="{{ path('retweet_post', { id: tweet.id }) }}">
+        <textarea name="content" rows="2" placeholder="Ajouter un commentaire (facultatif)" class="w-full p-2 mb-2 border border-gray-300 rounded"></textarea>
+
+        <button type="submit" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full">
+            🔁 Retweeter avec commentaire
+        </button>
+    </form>
+
+
+
 
     {# templates/tweet/show.html.twig #}
     
@@ -46,6 +58,7 @@
             </button>
         </form>
     {% endif %}
+
 
 
     <a href="{{ path('tweets_home') }}">← Retour à l'exploration</a>

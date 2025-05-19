@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use OpenApi\Attributes as OA;
+use Psr\Log\LoggerInterface;
+
 
 #[Route('/api/tweets')]
 class TweetController extends AbstractController
@@ -78,7 +80,7 @@ class TweetController extends AbstractController
     )]
     public function show(int $id, TweetService $tweetService): JsonResponse
     {
-        $user =$this->getUser();
+        $user = $this->getUser();
 
         $tweet = $tweetService->getFullEntity($id);
 
@@ -95,7 +97,7 @@ class TweetController extends AbstractController
         } else {
             $formattedTweet['isCurrentUser'] = false;
         }
-        
+
         return $this->json($formattedTweet);
     }
 
@@ -128,7 +130,7 @@ class TweetController extends AbstractController
         $payload = $request->toArray();
 
         try {
-                $tweetService->create($payload, $user);
+            $tweetService->create($payload, $user);
             return $this->json(['success' => true], 201);
         } catch (\Throwable $e) {
             return $this->json(['error' => $e->getMessage()], 400);
@@ -139,7 +141,7 @@ class TweetController extends AbstractController
     public function deleteTweet(int $id, TweetService $tweetService): JsonResponse
     {
         $user = $this->getUser();
-        
+
         if (!$user) {
             return $this->json(['error' => 'Non authentifié'], 401);
         }
@@ -169,7 +171,7 @@ class TweetController extends AbstractController
     #[Route('/{id}/update', methods: ['PUT'], name: 'tweet_update')]
     public function update(int $id, Request $request, TweetService $tweets): JsonResponse
     {
-        
+
         $user = $this->getUser();
         if (!$user) {
             return $this->json(['error' => 'Non authentifié'], 401);
@@ -192,7 +194,63 @@ class TweetController extends AbstractController
     }
 
 
+    #[Route('/retweet', methods: ['POST'], name: 'tweet_retweet')]
+    public function retweetTweet(
+        Request $request,
+        TweetService $tweetService,
+        LoggerInterface $logger
+    ): JsonResponse {
+        $logger->info('📩 Requête reçue pour retweet');
 
+        $user = $this->getUser();
 
+        if (!$user) {
+            $logger->warning('❌ Tentative de retweet sans utilisateur authentifié.');
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
 
+        $logger->info('👤 Utilisateur connecté : ' . $user->getUserIdentifier());
+
+        $payload = $request->toArray();        
+        $logger->debug('📦 Payload reçu : ' . json_encode($payload));
+        $originalTweetId = $payload['original_tweet_id'];
+        $commentaire = $payload['content'];
+
+        if (!isset($originalTweetId)) {
+            $logger->error('🚫 original_tweet_id manquant dans la requête');
+            return $this->json(['error' => 'Tweet original manquant'], 400);
+        }
+        $logger->debug('📦 Id reçu : ' .$originalTweetId);
+
+        try {
+            $retweet = $tweetService->retweet($originalTweetId, $user, $commentaire, $logger);
+            $logger->info('✅ Retweet créé avec succès. ID = ' . $retweet['id']);
+
+            return $this->json([
+                'success' => true,
+                'retweet_id' => $retweet['id'],
+            ], 201);
+
+        } catch (\InvalidArgumentException $e) {
+            $logger->error('❗ Validation erreur : ' . $e->getMessage());
+            return $this->json(['error' => $e->getMessage()], 422);
+        } catch (\RuntimeException $e) {
+            $logger->error('⛔ Erreur logique : ' . $e->getMessage());
+            return $this->json(['error' => $e->getMessage()], 404);
+        } catch (\Throwable $e) {
+            $logger->critical('💥 Exception inattendue : ' . $e->getMessage(), [
+                'type' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return $this->json([
+                'error' => 'Erreur interne',
+                'type' => get_class($e),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ], 500);
+        }
+    }
 }
