@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Notification;
 use App\Repository\NotificationRepository;
 use App\Service\NotificationApiClientService;
+use App\Service\UserApiClientService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -15,12 +16,16 @@ class NotificationController extends AbstractController
 {
 
     #[Route('', name: 'get_notifications')]
-    public function index(NotificationRepository $repo, SessionInterface $session, NotificationApiClientService $api): Response
+    public function index(NotificationRepository $repo, SessionInterface $session, NotificationApiClientService $api, UserApiClientService $userApi): Response
     {
         $api->setTokenFromSession($session);
+        $userApi->setTokenFromSession($session);
+
+        $me = $userApi->getMe();
         $notifs = $api->getNotifications();
 
         return $this->render('notification/index.html.twig', [
+            'profileMe' => $me,
             'notifications' => $notifs,
         ]);
     }

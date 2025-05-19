@@ -2,6 +2,9 @@
 
 {% block title %}Notifications{% endblock %}
 
+{% block sidebar_left %}
+    {{ include('profile/_card.html.twig', { user: profileMe, showActions: true }) }}
+{% endblock %}
 {% block body %}
 <h1>Mes notifications</h1>
 

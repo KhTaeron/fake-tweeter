@@ -2,6 +2,9 @@
 
 {% block title %}Tweet de {{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}{% endblock %}
 
+{% block sidebar_left %}
+    {{ include('profile/_card.html.twig', { user: profileMe, showActions: true }) }}
+{% endblock %}
 {% block body %}
 <div class="container">
     <h1>Tweet</h1>

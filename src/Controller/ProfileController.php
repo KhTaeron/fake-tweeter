@@ -34,6 +34,7 @@ class ProfileController extends AbstractController
     {
         $api->setTokenFromSession($session);
 
+        $me = $api->getMe();
         $user = $api->getUser($id);
 
         if (!$user) {
@@ -43,6 +44,7 @@ class ProfileController extends AbstractController
         $followers = $api->getFollowers($id);
 
         return $this->render('profile/followers.html.twig', [
+            'profileMe' => $me,
             'user' => $user,
             'followers' => $followers,
         ]);
@@ -55,6 +57,8 @@ class ProfileController extends AbstractController
 
         $user = $api->getUser($id);id: 
 
+        $me = $api->getMe();
+
         if (!$user) {
             throw $this->createNotFoundException('Utilisateur introuvable.');
         }
@@ -63,6 +67,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/following.html.twig', [
             'user' => $user,
+            'profileMe' => $me,
             'subscriptions' => $subscriptions,
         ]);
     }
@@ -155,6 +160,7 @@ class ProfileController extends AbstractController
         }
 
         return $this->render('profile/show.html.twig', [
+            'profileMe' => $me,
             'user' => $user,
             'selfProfile' => false,
         ]);

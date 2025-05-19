@@ -1,0 +1,42 @@
+{# templates/profile/_card.html.twig #}
+<div class="profile-card home-profile-card">
+    <div class="profile-header-bg">
+        {% if showActions ?? false %}
+            <div class="profile-actions">
+                <a href="{{ path('profile_edit') }}" class="edit-button" title="Modifier le profil">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </a>
+                <form method="post" action="{{ path('profile_delete') }}" onsubmit="return confirm('Supprimer votre compte ?')">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="delete-button" title="Supprimer le compte">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+
+        <img class="profile-avatar"
+             src="{{ user.avatar ? asset('uploads/avatars/' ~ user.avatar.path) : asset('images/default-avatar.webp') }}"
+             alt="Avatar">
+    </div>
+
+    <div class="profile-stats">
+        <a href="{{ path('profile_followers', {'id': user.id}) }}">
+            <div><strong>{{ user.followerCount }}</strong><br><span>Followers</span></div>
+        </a>
+        <a href="{{ path('profile_following', {'id': user.id}) }}">
+            <div><strong>{{ user.subscriptionCount }}</strong><br><span>Following</span></div>
+        </a>
+    </div>
+
+    <div class="profile-identity">
+        <h2>{{ user.fullName ?? user.pseudo }}</h2>
+        <p class="username">@{{ user.pseudo|lower }}</p>
+
+        {% if user.description %}
+            <p class="bio">{{ user.description }}</p>
+        {% else %}
+            <p class="bio empty">Ce profil n’a pas encore de description.</p>
+        {% endif %}
+    </div>
+</div>

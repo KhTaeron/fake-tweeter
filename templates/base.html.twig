@@ -1,18 +1,43 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        <script src="https://kit.fontawesome.com/3d9fc8a1b6.js" crossorigin="anonymous"></script>
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}FakeTweeter{% endblock %}</title>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+    <script src="https://kit.fontawesome.com/3d9fc8a1b6.js" crossorigin="anonymous"></script>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="app-layout">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    <header class="app-navbar">
+        <div class="nav-left">
+            <a href="{{ path('tweets_home') }}" class="logo">🌀</a>
+        </div>
+        <div class="nav-center">
+            <a href="{{ path('get_notifications') }}" class="logo">
+                <i class="fa-regular fa-bell notification-icon"></i>
+            </a>
+        </div>
+        <div class="nav-right">
+            <form method="post" action="{{ path('login') }}">
+                <button type="submit" class="logout-button">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <main class="app-columns">
+        <aside class="sidebar-left">
+            {% block sidebar_left %}
+            {% endblock %}
+        </aside>
+
+        <section class="main-feed">
+            {% block body %}{% endblock %}
+        </section>
+    </main>
+
+</body>
 </html>

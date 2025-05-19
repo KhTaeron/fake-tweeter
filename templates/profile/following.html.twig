@@ -5,6 +5,9 @@
     <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
 {% endblock %}
 
+{% block sidebar_left %}
+    {{ include('profile/_card.html.twig', { user: profileMe, showActions: true }) }}
+{% endblock %}
 {% block body %}
 <div class="profile-card">
     <h2>Abonnements de {{ user.pseudo }}</h2>

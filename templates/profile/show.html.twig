@@ -8,6 +8,9 @@
 {% endblock %}
 
 
+{% block sidebar_left %}
+    {{ include('profile/_card.html.twig', { user: profileMe, showActions: true }) }}
+{% endblock %}
 {% block body %}
 <div class="profile-card">
     <div class="profile-header-bg">

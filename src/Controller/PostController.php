@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\TweetApiClientService;
+use App\Service\UserApiClientService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,9 +16,12 @@ use Psr\Log\LoggerInterface;
 class PostController extends AbstractController
 {
     #[Route('/{id}', name: 'tweet_detail', requirements: ['id' => '\d+'])]
-    public function show(int $id, SessionInterface $session, TweetApiClientService $api): Response
+    public function show(int $id, SessionInterface $session, TweetApiClientService $api, UserApiClientService $userApi): Response
     {
         $api->setTokenFromSession($session);
+        $userApi->setTokenFromSession($session);
+
+        $me = $userApi->getMe();
 
         $tweet = $api->getTweet($id);
         $likes = $api->getLikes($id);
@@ -27,6 +31,7 @@ class PostController extends AbstractController
         }
 
         return $this->render('tweet/show.html.twig', [
+            'profileMe' => $me,
             'tweet' => $tweet,
             'likes' => $likes,
         ]);

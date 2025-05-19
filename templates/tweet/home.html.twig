@@ -1,46 +1,49 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Explorer les Tweets{% endblock %}
-
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/tweet.css') }}">
 {% endblock %}
-{% block body %}
-<div class="container">
 
-    <a class="tweet-button" href="{{ path('profile_me') }}" class="profile-button">🏠</a>
-    <h1 style="text-align: center;">Explorer les Tweets</h1>
-    <div>
-        <div>
-            <form method="get" action="{{ path('tweets_home') }}" class="search-bar">
-                <input type="text" name="q" placeholder="Rechercher un mot..." value="{{ keyword }}">
-                <button type="submit">Rechercher</button>
-            </form>
-        </div>
+{% block title %}Accueil{% endblock %}
+
+{% block sidebar_left %}
+    {{ include('profile/_card.html.twig', { user: user, showActions: true }) }}
+{% endblock %}
+{% block body %}
+    <div class="home-container">
+
+        <form method="get" action="{{ path('tweets_home') }}" class="search-bar">
+            <input type="text" name="q" placeholder="Rechercher..." value="{{ keyword }}">
+            <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
         <div class="new-tweet-box">
             <form method="post" action="{{ path('tweet_create_submit') }}">
-                <textarea name="content"
-                        placeholder="Quoi de neuf ?" rows="3" required></textarea>
+                <textarea name="content" placeholder="Quoi de neuf ?" rows="3" required></textarea>
                 <button type="submit" class="tweet-button">Tweeter</button>
             </form>
         </div>
-    </div>
-    {% if tweets is empty %}
-        <p style="text-align: center; color: #657786;">Aucun tweet trouvé.</p>
-    {% else %}
-        {% for tweet in tweets %}
-            <div class="tweet">
-                <a href="{{ path('tweet_detail', { id: tweet.id }) }}" style="text-decoration: none; color: inherit;">
-                    <strong>{{ tweet.tweeter.pseudo ?? 'Utilisateur inconnu' }}</strong><br>
-                    {{ tweet.content }}<br>
-                    <small>{{ tweet.publicationDate|date('d/m/Y H:i') }}</small>
 
-                    <div class="tweet">
-                        <p><strong>{{ tweet.likes_count }} like{{ tweet.likes_count > 1 ? 's' : '' }}</strong></p>
+        <div class="tweet-feed">
+            {% for tweet in tweets %}
+                <a href="{{ path('tweet_detail', { id: tweet.id }) }}" class="tweet-clickable">
+                    <div class="tweet-card">
+                        <div class="tweet-header">
+                            <strong>{{ tweet.tweeter.pseudo }}</strong>
+                            <span class="tweet-date">{{ tweet.publicationDate|date('d/m/Y H:i') }}</span>
+                        </div>
+                        <div class="tweet-content">
+                            <p>{{ tweet.content }}</p>
+                        </div>
+                        <div class="tweet-footer">
+                            <span>{{ tweet.likes_count }} ❤️</span>
+                        </div>
                     </div>
-
                 </a>
-            </div>
-        {% endfor %}
-    {% endif %} 
+            {% else %}
+                <p class="empty">Aucun tweet trouvé.</p>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
+

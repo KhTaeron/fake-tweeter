@@ -64,6 +64,19 @@ a:hover .follower {
     position: relative;
 }
 
+.profile-card.home-profile-card {
+    background-color: #1c1c1c;
+    border-radius: 20px;
+    color: #fff;
+    width: 90%;
+    margin: 0 auto;
+    text-align: center;
+    padding: 0 1.5rem 1rem 1rem;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+    font-family: 'Segoe UI', sans-serif;
+    position: relative;
+}
+
 .profile-header-bg {
     background: radial-gradient(circle, #ffcc00 0%, #1c1c1c 65%);
     height: 100px;
