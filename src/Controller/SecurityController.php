@@ -36,6 +36,15 @@ class SecurityController extends AbstractController
         return $this->redirectToRoute('tweets_home');
     }
 
+    #[Route('/logout', name: 'logout')]
+    public function logout(SessionInterface $session): Response
+    {
+        $session->clear();
+        $this->addFlash('success', 'Déconnexion réussie.');
+        return $this->redirectToRoute('login_form');
+    }
+
+
     #[Route('/register', name: 'register_form')]
     public function registerForm(): Response
     {
